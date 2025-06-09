@@ -4,146 +4,192 @@ import 'package:lancheria/drinks_page.dart';
 import 'package:lancheria/sobremesas_page.dart';
 import 'package:lancheria/minha_conta_page.dart';
 import 'package:lancheria/avaliar_local_page.dart';
-import 'package:lancheria/gerenciamento_pedidos_page.dart'; // Importa a nova página do gerente
+import 'package:lancheria/gerenciamento_pedidos_page.dart';
 
-class HomePage extends StatelessWidget {
+enum ProductView { lanches, drinks, sobremesas }
+
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  ProductView _selectedProductView = ProductView.lanches; // Default view
+  late Widget _currentRightPanelContent;
 
   void _showGarcomSnackBar(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Garçom chamado! Em breve alguém virá te atender.'),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         action: SnackBarAction(
           label: 'OK',
           textColor: Colors.white,
-          onPressed: () {
-            // Ação opcional ao clicar em OK
-          },
+          onPressed: () {},
         ),
       ),
     );
   }
 
   @override
+  void initState() {
+    super.initState();
+    // Inicializa o conteúdo do painel direito com a visualização padrão
+    _currentRightPanelContent = _getPageForView(_selectedProductView);
+  }
+
+  // Retorna o widget de conteúdo para a visualização selecionada
+  // IMPORTANTE: LanchesPage, DrinksPage, SobremesasPage idealmente não devem ter seu próprio Scaffold
+  // para serem embutidas corretamente aqui. Elas devem ser widgets de conteúdo.
+  Widget _getPageForView(ProductView view) {
+    switch (view) {
+      case ProductView.lanches:
+        return const LanchesPage(); // Ou um LanchesListWidget()
+      case ProductView.drinks:
+        return const DrinksPage(); // Ou um DrinksListWidget()
+      case ProductView.sobremesas:
+        return const SobremesasPage(); // Ou um SobremesasListWidget()
+    }
+  }
+
+  // Atualiza a visualização do produto e o conteúdo do painel direito
+  void _selectProductView(ProductView view) {
+    setState(() {
+      _selectedProductView = view;
+      _currentRightPanelContent = _getPageForView(view);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.orange[50],
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Bem-vindo!',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepOrange,
-                ),
-              ),
-              const SizedBox(height: 50),
-
-              _buildOptionButton(
-                context,
-                'LANCHES',
-                () => const LanchesPage(),
-                Icons.fastfood,
-              ),
-              const SizedBox(height: 15),
-
-              _buildOptionButton(
-                context,
-                'DRINKS',
-                () => const DrinksPage(),
-                Icons.local_drink,
-              ),
-              const SizedBox(height: 15),
-
-              _buildOptionButton(
-                context,
-                'SOBREMESAS',
-                () => const SobremesasPage(),
-                Icons.cake,
-              ),
-              const SizedBox(height: 15),
-
-              _buildOptionButton(
-                context,
-                'AVALIAR LOCAL',
-                () => const AvaliarLocalPage(),
-                Icons.star_rate,
-              ),
-              const SizedBox(height: 15),
-
-              _buildOptionButton(
-                context,
-                'MINHA CONTA',
-                () => const MinhaContaPage(),
-                Icons.person,
-              ),
-              const SizedBox(height: 30),
-
-              // NOVO BOTÃO PARA O GERENTE
-              _buildOptionButton(
-                context,
-                'GESTÃO DE PEDIDOS',
-                () => const GerenciamentoPedidosPage(),
-                Icons.manage_accounts, // Ícone para gestão
-              ),
-              const SizedBox(height: 30), // Espaçamento adicional
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    _showGarcomSnackBar(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueGrey,
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  icon: const Icon(Icons.notifications_active, color: Colors.white),
-                  label: const Text(
-                    'CHAMAR GARÇOM',
-                    style: TextStyle(fontSize: 20, color: Colors.white),
+      appBar: AppBar(
+        title: const Text('Cardápio Lancheria'),
+        backgroundColor: Colors.deepOrange,
+        // Você pode adicionar um ícone de carrinho aqui depois, se desejar
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.shopping_cart),
+        //     onPressed: () {
+        //       Navigator.push(context, MaterialPageRoute(builder: (context) => const CarrinhoPage()));
+        //     },
+        //   ),
+        // ],
+      ),
+      body: Row(
+        children: [
+          // Painel Esquerdo (Navegação)
+          Container(
+            width: 280, // Ajuste a largura conforme necessário
+            color: Colors.grey[100], // Um fundo sutil para o painel
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+                  child: Column(
+                    children: [
+                      Image.asset('assets/logo.png', height: 80),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Bem-vindo!',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.brown[800],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    children: [
+                      _buildLeftPanelProductItem('LANCHES', Icons.fastfood, ProductView.lanches),
+                      _buildLeftPanelProductItem('DRINKS', Icons.local_drink, ProductView.drinks),
+                      _buildLeftPanelProductItem('SOBREMESAS', Icons.cake, ProductView.sobremesas),
+                      const Divider(height: 24, thickness: 1, indent: 16, endIndent: 16),
+                      _buildLeftPanelNavigationItem('AVALIAR LOCAL', Icons.star_border_outlined, () => const AvaliarLocalPage()),
+                      _buildLeftPanelNavigationItem('MINHA CONTA', Icons.person_outline, () => const MinhaContaPage()),
+                      _buildLeftPanelNavigationItem('GESTÃO DE PEDIDOS', Icons.article_outlined, () => const GerenciamentoPedidosPage()),
+                      const Divider(height: 24, thickness: 1, indent: 16, endIndent: 16),
+                      _buildLeftPanelActionItem('CHAMAR GARÇOM', Icons.notifications_active_outlined, () {
+                        _showGarcomSnackBar(context);
+                      }),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+          // Painel Direito (Conteúdo)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: AnimatedSwitcher( // Adiciona uma transição suave ao mudar o conteúdo
+                duration: const Duration(milliseconds: 300),
+                child: _currentRightPanelContent, // Exibe o conteúdo dinâmico
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildOptionButton(BuildContext context, String text, Widget Function() pageBuilder, IconData icon) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: () {
+  // Método para construir itens do painel esquerdo que mudam o conteúdo do painel direito
+  Widget _buildLeftPanelProductItem(String title, IconData icon, ProductView view) {
+    bool isSelected = _selectedProductView == view;
+    return Material(
+      color: isSelected ? Colors.deepOrange.withOpacity(0.15) : Colors.transparent,
+      child: ListTile(
+        leading: Icon(icon, color: isSelected ? Colors.deepOrange : Colors.grey[700], size: 26),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? Colors.deepOrange : Colors.black87,
+            fontSize: 16,
+          ),
+        ),
+        onTap: () => _selectProductView(view),
+        selected: isSelected,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+      ),
+    );
+  }
+
+  // Método para construir itens do painel esquerdo que navegam para uma nova página
+  Widget _buildLeftPanelNavigationItem(String title, IconData icon, Widget Function() pageBuilder) {
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        leading: Icon(icon, color: Colors.grey[700], size: 26),
+        title: Text(title, style: const TextStyle(color: Colors.black87, fontSize: 16)),
+        onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => pageBuilder()),
           );
         },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.deepOrange,
-          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-        icon: Icon(icon, color: Colors.white),
-        label: Text(
-          text,
-          style: const TextStyle(fontSize: 20, color: Colors.white),
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+      ),
+    );
+  }
+
+  // Método para construir itens do painel esquerdo que executam uma ação
+  Widget _buildLeftPanelActionItem(String title, IconData icon, VoidCallback onPressed) {
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        leading: Icon(icon, color: Colors.grey[700], size: 26),
+        title: Text(title, style: const TextStyle(color: Colors.black87, fontSize: 16)),
+        onTap: onPressed,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
       ),
     );
   }
