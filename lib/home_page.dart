@@ -3,8 +3,11 @@ import 'package:lancheria/lanches_page.dart';
 import 'package:lancheria/drinks_page.dart';
 import 'package:lancheria/sobremesas_page.dart';
 import 'package:lancheria/minha_conta_page.dart';
-import 'package:lancheria/avaliar_local_page.dart';
 import 'package:lancheria/gerenciamento_pedidos_page.dart';
+import 'package:lancheria/app_config.dart'; // Importar AppConfig
+import 'package:lancheria/avaliar_local_page.dart';
+
+
 
 enum ProductView { lanches, drinks, sobremesas }
 
@@ -47,11 +50,11 @@ class _HomePageState extends State<HomePage> {
   Widget _getPageForView(ProductView view) {
     switch (view) {
       case ProductView.lanches:
-        return const LanchesPage(); // Ou um LanchesListWidget()
+        return LanchesPage(fetchLanches: AppConfig.instance.getLanches);
       case ProductView.drinks:
-        return const DrinksPage(); // Ou um DrinksListWidget()
+        return DrinksPage(fetchDrinks: AppConfig.instance.getDrinks);
       case ProductView.sobremesas:
-        return const SobremesasPage(); // Ou um SobremesasListWidget()
+        return SobremesasPage(fetchSobremesas: AppConfig.instance.getSobremesas);
     }
   }
 
@@ -67,7 +70,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cardápio Lancheria'),
+        title: Text('Cardápio ${AppConfig.instance.establishmentName}'), // Usar nome do AppConfig
         backgroundColor: Colors.deepOrange,
         // Você pode adicionar um ícone de carrinho aqui depois, se desejar
         // actions: [
@@ -91,7 +94,11 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
                   child: Column(
                     children: [
-                      Image.asset('assets/logo.png', height: 80),
+                      Image.asset(
+                        AppConfig.instance.logoAssetPath, // Usar logo do AppConfig
+                        height: 80,
+                        errorBuilder: (context, error, stackTrace) => const Icon(Icons.storefront, size: 80, color: Colors.brown), // Fallback
+                      ),
                       const SizedBox(height: 12),
                       Text(
                         'Bem-vindo!',
@@ -145,7 +152,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildLeftPanelProductItem(String title, IconData icon, ProductView view) {
     bool isSelected = _selectedProductView == view;
     return Material(
-      color: isSelected ? Colors.deepOrange.withOpacity(0.15) : Colors.transparent,
+      color: isSelected ? Colors.deepOrange : Colors.transparent,
       child: ListTile(
         leading: Icon(icon, color: isSelected ? Colors.deepOrange : Colors.grey[700], size: 26),
         title: Text(
