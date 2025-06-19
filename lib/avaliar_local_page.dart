@@ -28,19 +28,24 @@ class _AvaliarLocalPageState extends State<AvaliarLocalPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Avaliar Local'),
-        backgroundColor: Colors.deepOrange,
-      ),
-      body: Padding(
+    // Removido Scaffold e AppBar. A página agora retorna diretamente seu conteúdo principal.
+    // Se a página precisar rolar, envolva o Padding com SingleChildScrollView.
+    return SingleChildScrollView(
+      // Adicionado para garantir que o conteúdo role se for muito grande
+      child: Padding(
         padding: const EdgeInsets.all(_kPagePadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
+            Text(
               'Como você avalia nosso local?',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.deepOrange),
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary, // Usar cor primária do tema
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: _kVerticalSpacing),
@@ -50,7 +55,9 @@ class _AvaliarLocalPageState extends State<AvaliarLocalPage> {
                 return IconButton(
                   icon: Icon(
                     index < _rating ? Icons.star : Icons.star_border,
-                    color: Colors.amber,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .secondary, // Usar cor secundária (accent) do tema
                     size: _kStarIconSize,
                   ),
                   onPressed: () {
@@ -72,7 +79,12 @@ class _AvaliarLocalPageState extends State<AvaliarLocalPage> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(_kBorderRadius),
-                  borderSide: const BorderSide(color: Colors.deepOrange, width: 2),
+                  borderSide: BorderSide(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary, // Usar cor primária do tema
+                    width: 2,
+                  ),
                 ),
               ),
             ),
@@ -84,7 +96,9 @@ class _AvaliarLocalPageState extends State<AvaliarLocalPage> {
                   // Por enquanto, apenas mostraremos um SnackBar.
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Avaliação de $_rating estrelas enviada! Obrigado pelo feedback.'),
+                      content: Text(
+                        'Avaliação de $_rating estrelas enviada! Obrigado pelo feedback.',
+                      ),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -92,22 +106,33 @@ class _AvaliarLocalPageState extends State<AvaliarLocalPage> {
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Por favor, selecione uma avaliação em estrelas.'),
+                      content: Text(
+                        'Por favor, selecione uma avaliação em estrelas.',
+                      ),
                       backgroundColor: Colors.red,
                     ),
                   );
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepOrange,
-                padding: const EdgeInsets.symmetric(vertical: _kButtonVerticalPadding),
+                backgroundColor: Theme.of(
+                  context,
+                ).colorScheme.primary, // Usar cor primária do tema
+                foregroundColor: Theme.of(
+                  context,
+                ).colorScheme.onPrimary, // Cor do texto sobre a cor primária
+                padding: const EdgeInsets.symmetric(
+                  vertical: _kButtonVerticalPadding,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(_kBorderRadius),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 'Enviar Avaliação',
-                style: TextStyle(fontSize: 20, color: Colors.white),
+                style: TextStyle(
+                  fontSize: 20,
+                ), // A cor do texto é definida por foregroundColor
               ),
             ),
           ],

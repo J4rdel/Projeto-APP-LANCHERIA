@@ -7,13 +7,13 @@ class MinhaContaPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Minha Conta'),
-        backgroundColor: Colors.deepOrange,
+        title: const Text('Minha Conta'), // backgroundColor e foregroundColor virão do tema
       ),
-      body: const Center(
+      body: Center( // Mantém o Center para o layout do conteúdo
         child: Text(
           'Aqui você verá seus dados e pedidos!',
           style: TextStyle(fontSize: 20, color: Colors.grey),
+          // Para usar a cor do tema: Theme.of(context).textTheme.bodyMedium?.color
         ),
       ),
     );
