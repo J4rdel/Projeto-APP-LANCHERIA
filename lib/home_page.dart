@@ -5,6 +5,7 @@ import 'package:lancheria/sobremesas_page.dart';
 import 'package:lancheria/minha_conta_page.dart';
 import 'package:lancheria/gerenciamento_pedidos_page.dart';
 import 'package:lancheria/app_config.dart'; // Importar AppConfig
+import 'package:lancheria/carrinho_page.dart'; // Importar CarrinhoPage
 import 'package:lancheria/avaliar_local_page.dart'; // Importar AvaliarLocalPage
 import 'package:provider/provider.dart'; // Importar Provider
 import 'package:lancheria/theme_manager.dart'; // Importar ThemeManager
@@ -13,6 +14,7 @@ enum ContentView {
   lanches,
   drinks,
   sobremesas,
+  carrinho, // Nova visualização para o carrinho
   avaliarLocal,
   minhaConta,
   gestaoPedidos,
@@ -60,14 +62,21 @@ class _HomePageState extends State<HomePage> {
     switch (view) {
       case ContentView.lanches:
         return LanchesPage(
-          fetchLanches: _appConfig.getLanches,
+          fetchLanches: _appConfig.getLanches, // Usar _appConfig
+          onViewCart: () => _selectContentView(ContentView.carrinho),
         ); // Usar _appConfig
       case ContentView.drinks:
-        return DrinksPage(fetchDrinks: AppConfig.instance.getDrinks);
+        return DrinksPage(
+          fetchDrinks: _appConfig.getDrinks, // Usar _appConfig
+          onViewCart: () => _selectContentView(ContentView.carrinho),
+        );
       case ContentView.sobremesas:
         return SobremesasPage(
-          fetchSobremesas: AppConfig.instance.getSobremesas,
+          fetchSobremesas: _appConfig.getSobremesas, // Usar _appConfig
+          onViewCart: () => _selectContentView(ContentView.carrinho),
         );
+      case ContentView.carrinho:
+        return const CarrinhoPage();
       case ContentView.avaliarLocal:
         return const AvaliarLocalPage(); // Deve ser ajustada para não ter Scaffold
       case ContentView.minhaConta:
@@ -184,6 +193,12 @@ class _HomePageState extends State<HomePage> {
                         Icons.cake,
                         ContentView.sobremesas,
                       ),
+                      _buildLeftPanelItem(
+                        // Item para o Carrinho
+                        'CARRINHO',
+                        Icons.shopping_cart_outlined,
+                        ContentView.carrinho,
+                      ),
                       const Divider(
                         height: 24,
                         indent: 16,
@@ -209,20 +224,6 @@ class _HomePageState extends State<HomePage> {
                         indent: 16,
                         endIndent: 16,
                       ), // Cor e espessura do DividerTheme
-                      _buildLeftPanelActionItem(
-                        // Este item pode ser mantido ou removido, dependendo da sua preferência
-                        isDarkMode ? 'Tema Claro' : 'Tema Escuro',
-                        isDarkMode
-                            ? Icons.light_mode_outlined
-                            : Icons.dark_mode_outlined,
-                        () {
-                          // Não precisa de listen: false aqui se o rebuild do item for desejado
-                          Provider.of<ThemeManager>(
-                            context,
-                            listen: false,
-                          ).toggleTheme();
-                        },
-                      ),
                       _buildLeftPanelActionItem(
                         'CHAMAR GARÇOM',
                         Icons.notifications_active_outlined,

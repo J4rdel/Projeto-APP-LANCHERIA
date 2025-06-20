@@ -1,23 +1,17 @@
 // lib/models/pedido.dart
-import 'lanche.dart'; // Reutilize o modelo Lanche
+import 'package:lancheria/produto.dart'; // Importar Produto
 import 'package:flutter/material.dart'; // Necessário para a cor
 
-enum StatusPedido {
-  pendente,
-  preparando,
-  aCaminho,
-  entregue,
-  cancelado,
-}
+enum StatusPedido { pendente, preparando, aCaminho, entregue, cancelado }
 
 class ItemPedido {
-  final Lanche lanche;
+  final Produto produto;
   int quantidade;
   String? observacoes; // Ex: "Sem cebola"
 
-  ItemPedido({required this.lanche, this.quantidade = 1, this.observacoes});
+  ItemPedido({required this.produto, this.quantidade = 1, this.observacoes});
 
-  double get subtotal => lanche.preco * quantidade;
+  double get subtotal => produto.preco * quantidade;
 }
 
 class Pedido {

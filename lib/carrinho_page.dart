@@ -1,110 +1,242 @@
 import 'package:flutter/material.dart';
+import 'package:lancheria/app_config.dart';
+import 'package:lancheria/carrinho.dart';
+import 'package:lancheria/gerenciador_pedidos.dart';
+//import 'package:lancheria/item_carrinho.dart'; // Adicionando o import que faltava
+import 'package:lancheria/pedido.dart';
 import 'package:provider/provider.dart';
-import 'carrinho.dart'; // Importe seu modelo de Carrinho
 
 class CarrinhoPage extends StatelessWidget {
   const CarrinhoPage({super.key});
 
+  void _finalizarPedido(
+    BuildContext context,
+    Carrinho carrinho,
+    GerenciadorPedidos gerenciadorPedidos,
+  ) {
+    if (carrinho.itens.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Seu carrinho está vazio!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Criar lista de ItemPedido a partir de ItemCarrinho
+    final List<ItemPedido> itensPedido = carrinho.itens.map((itemCarrinho) {
+      return ItemPedido(
+        produto: itemCarrinho.produto,
+        quantidade: itemCarrinho.quantidade,
+      );
+    }).toList();
+
+    // Criar o Pedido
+    final novoPedido = Pedido(
+      // Gerar um ID único para o pedido (exemplo simples)
+      id: 'PED${DateTime.now().millisecondsSinceEpoch}',
+      idCliente: 'cliente_local_01', // Mock ID do cliente
+      itens: itensPedido,
+      valorTotal: carrinho.valorTotal,
+      dataHoraPedido: DateTime.now(),
+      status: StatusPedido.pendente, // Status inicial
+    );
+
+    // Adicionar ao gerenciador de pedidos
+    gerenciadorPedidos.addPedido(novoPedido);
+
+    // Limpar o carrinho
+    carrinho.limparCarrinho();
+
+    // Mostrar confirmação
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Pedido Realizado!'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Seu pedido (ID: ${novoPedido.id}) foi enviado para o balcão.',
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Valor Total: ${AppConfig.instance.currencySymbol} ${novoPedido.valorTotal.toStringAsFixed(2)}',
+            ),
+            const SizedBox(height: 10),
+            const Text('Obrigado pela preferência!'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: const Text('OK'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Escuta as mudanças no Carrinho
     final carrinho = Provider.of<Carrinho>(context);
+    final gerenciadorPedidos = Provider.of<GerenciadorPedidos>(
+      context,
+      listen: false,
+    );
+    final String currency = AppConfig.instance.currencySymbol;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Seu Pedido'),
-        backgroundColor: Colors.deepOrange,
-      ),
-      body: carrinho.itens.isEmpty
-          ? const Center(
-              child: Text(
-                'Seu carrinho está vazio!',
-                style: TextStyle(fontSize: 20, color: Colors.grey),
-              ),
-            )
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
+      // appBar: AppBar( // O AppBar já é fornecido pela HomePage
+      //   title: const Text('Meu Carrinho'),
+      // ),
+      body: Column(
+        children: [
+          Expanded(
+            child: carrinho.itens.isEmpty
+                ? const Center(
+                    child: Text(
+                      'Seu carrinho está vazio!',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  )
+                : ListView.builder(
                     itemCount: carrinho.itens.length,
-                    itemBuilder: (context, index) {
-                      final lanche = carrinho.itens[index];
+                    itemBuilder: (ctx, i) {
+                      final item = carrinho.itens[i];
                       return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 4,
+                        ),
                         child: ListTile(
-                          leading: lanche.imagemUrl != null && lanche.imagemUrl!.isNotEmpty
-                              ? CircleAvatar(
-                                  backgroundImage: NetworkImage(lanche.imagemUrl!),
-                                  radius: 25,
+                          leading:
+                              (item.produto.imagemUrl != null &&
+                                  item.produto.imagemUrl!.isNotEmpty)
+                              ? Image.asset(
+                                  item
+                                      .produto
+                                      .imagemUrl!, // Usamos '!' porque já verificamos que não é nulo e não é vazio
+                                  width: 50,
+                                  height: 50,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (ctx, err, st) => Icon(
+                                    Icons
+                                        .broken_image, // Ícone alternativo para erro de carregamento
+                                    size: 50,
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).iconTheme.color?.withOpacity(0.5) ??
+                                        Colors.grey,
+                                  ),
                                 )
-                              : const Icon(Icons.fastfood, size: 40, color: Colors.deepOrange),
-                          title: Text(lanche.nome, style: const TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text(lanche.precoFormatado),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              carrinho.removerLanche(lanche);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('${lanche.nome} removido do carrinho!')),
-                              );
-                            },
+                              : Icon(
+                                  Icons
+                                      .image_not_supported, // Ícone para quando não há imagemUrl
+                                  size: 50,
+                                  color:
+                                      Theme.of(
+                                        context,
+                                      ).iconTheme.color?.withOpacity(0.5) ??
+                                      Colors.grey,
+                                ),
+                          title: Text(item.produto.nome),
+                          subtitle: Text(
+                            'Qtd: ${item.quantidade} x $currency ${item.produto.preco.toStringAsFixed(2)}',
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                '$currency ${item.subtotal.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.remove_circle_outline,
+                                  color: Colors.orange,
+                                ),
+                                onPressed: () {
+                                  carrinho.removerUnidade(item.produto);
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () {
+                                  carrinho.removerProdutoCompletamente(
+                                    item.produto,
+                                  );
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       );
                     },
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Total:',
-                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            'R\$ ${carrinho.valorTotal.toStringAsFixed(2)}',
-                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.deepOrange),
-                          ),
-                        ],
+          ),
+          if (carrinho.itens.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      const Text(
+                        'Total:',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      const SizedBox(height: 15),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (carrinho.itens.isNotEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Pedido finalizado!')),
-                              );
-                              carrinho.limparCarrinho(); // Limpa o carrinho após finalizar
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Adicione itens ao carrinho para finalizar o pedido!')),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepOrange,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text(
-                            'Finalizar Pedido',
-                            style: TextStyle(fontSize: 20, color: Colors.white),
-                          ),
+                      Text(
+                        '$currency ${carrinho.valorTotal.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(
+                        double.infinity,
+                        50,
+                      ), // Botão largo
+                      textStyle: const TextStyle(fontSize: 18),
+                    ),
+                    child: const Text('FINALIZAR PEDIDO'),
+                    onPressed: () =>
+                        _finalizarPedido(context, carrinho, gerenciadorPedidos),
+                  ),
+                  TextButton(
+                    child: const Text(
+                      'Limpar Carrinho',
+                      style: TextStyle(color: Colors.redAccent),
+                    ),
+                    onPressed: () {
+                      carrinho.limparCarrinho();
+                    },
+                  ),
+                ],
+              ),
             ),
+        ],
+      ),
     );
   }
 }

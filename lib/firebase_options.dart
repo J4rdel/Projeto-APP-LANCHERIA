@@ -14,6 +14,7 @@ import 'package:flutter/foundation.dart'
 ///   options: DefaultFirebaseOptions.currentPlatform,
 /// );
 /// ```
+
 class DefaultFirebaseOptions {
   static FirebaseOptions? get currentPlatform {
     if (kIsWeb) {
@@ -34,20 +35,21 @@ class DefaultFirebaseOptions {
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.fuchsia:
-        
         throw UnimplementedError();
     }
   }
 
+  // ...
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'YOUR_WEB_API_KEY',
-    appId: 'YOUR_WEB_APP_ID',
-    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    authDomain: 'YOUR_AUTH_DOMAIN',
-    storageBucket: 'YOUR_STORAGE_BUCKET',
+    apiKey: 'YOUR_WEB_API_KEY', // PRECISA SER A CHAVE REAL
+    appId: 'YOUR_WEB_APP_ID', // PRECISA SER O ID REAL
+    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID', // PRECISA SER O ID REAL
+    projectId: 'YOUR_PROJECT_ID', // PRECISA SER O ID REAL
+    authDomain: 'YOUR_AUTH_DOMAIN', // PRECISA SER O DOMÍNIO REAL
+    storageBucket: 'YOUR_STORAGE_BUCKET', // PRECISA SER O BUCKET REAL
     // ... outros campos se houver
   );
+  // ... e similar para android e ios
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'YOUR_ANDROID_API_KEY',
@@ -67,9 +69,9 @@ class DefaultFirebaseOptions {
     iosBundleId: 'YOUR_IOS_BUNDLE_ID',
     // ... outros campos se houver
   );
-  
+
   static FirebaseOptions? get macos => null;
-  
+
   static FirebaseOptions? get windows => null;
 
   // Adicione outras plataformas se configuradas (macos, windows)

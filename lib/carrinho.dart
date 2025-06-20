@@ -1,26 +1,56 @@
 import 'package:flutter/foundation.dart';
-import 'lanche.dart'; // Importe seu modelo de Lanche
+import 'package:lancheria/item_carrinho.dart';
+import 'package:lancheria/produto.dart';
 
 class Carrinho with ChangeNotifier {
-  final List<Lanche> _itens = [];
+  final List<ItemCarrinho> _itens = [];
 
-  List<Lanche> get itens => List.unmodifiable(_itens); // Retorna uma cópia para evitar modificações externas
+  List<ItemCarrinho> get itens => List.unmodifiable(_itens);
 
   double get valorTotal {
     double total = 0.0;
     for (var item in _itens) {
-      total += item.preco;
+      total += item.subtotal;
     }
     return total;
   }
 
-  void adicionarLanche(Lanche lanche) {
-    _itens.add(lanche);
-    notifyListeners(); // Notifica os widgets que estão ouvindo
+  int get quantidadeTotalItens {
+    int total = 0;
+    for (var item in _itens) {
+      total += item.quantidade;
+    }
+    return total;
   }
 
-  void removerLanche(Lanche lanche) {
-    _itens.remove(lanche);
+  void adicionarItem(Produto produto) {
+    // Verifica se o item já existe no carrinho
+    final index = _itens.indexWhere((item) => item.produto.id == produto.id);
+
+    if (index >= 0) {
+      // Se existe, incrementa a quantidade
+      _itens[index].quantidade++;
+    } else {
+      // Se não existe, adiciona como um novo ItemCarrinho
+      _itens.add(ItemCarrinho(produto: produto, quantidade: 1));
+    }
+    notifyListeners();
+  }
+
+  void removerUnidade(Produto produto) {
+    final index = _itens.indexWhere((item) => item.produto.id == produto.id);
+    if (index >= 0) {
+      if (_itens[index].quantidade > 1) {
+        _itens[index].quantidade--;
+      } else {
+        _itens.removeAt(index);
+      }
+      notifyListeners();
+    }
+  }
+
+  void removerProdutoCompletamente(Produto produto) {
+    _itens.removeWhere((item) => item.produto.id == produto.id);
     notifyListeners();
   }
 

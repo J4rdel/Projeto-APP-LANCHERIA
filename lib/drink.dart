@@ -1,15 +1,11 @@
-class Drink {
-  final String nome;
-  final double preco;
-  final String? descricao;
-  final String? imagemUrl; // URL da imagem do drink
+import 'package:lancheria/produto.dart';
 
+class Drink extends Produto {
   Drink({
-    required this.nome,
-    required this.preco,
-    this.descricao,
-    this.imagemUrl,
-  });
-
-  String get precoFormatado => 'R\$ ${preco.toStringAsFixed(2)}';
+    required super.id,
+    required super.nome,
+    required super.preco,
+    super.descricao,
+    super.imagemUrl,
+  }) : super();
 }

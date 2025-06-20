@@ -1,15 +1,11 @@
-class Sobremesa {
-  final String nome;
-  final double preco;
-  final String? descricao;
-  final String? imagemUrl; // URL da imagem da sobremesa
+import 'package:lancheria/produto.dart';
 
+class Sobremesa extends Produto {
   Sobremesa({
-    required this.nome,
-    required this.preco,
-    this.descricao,
-    this.imagemUrl,
-  });
-
-  String get precoFormatado => 'R\$ ${preco.toStringAsFixed(2)}';
+    required super.id,
+    required super.nome,
+    required super.preco,
+    super.descricao,
+    super.imagemUrl,
+  }) : super();
 }

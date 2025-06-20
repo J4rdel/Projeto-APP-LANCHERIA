@@ -19,6 +19,8 @@ class AppThemeColors {
   final Color selectedItemColor;
   final Color selectedItemTextColor;
   final Brightness brightness; // Essencial para ThemeData (light/dark)
+  final String? mainFontFamily; // Opcional: fonte principal
+  final String? headlineFontFamily; // Opcional: fonte para títulos
 
   const AppThemeColors({
     required this.primaryColor,
@@ -33,6 +35,8 @@ class AppThemeColors {
     required this.selectedItemColor,
     required this.selectedItemTextColor,
     required this.brightness,
+    this.mainFontFamily,
+    this.headlineFontFamily,
   });
 }
 
@@ -83,6 +87,8 @@ class AppConfig {
     selectedItemColor: Colors.deepOrange.shade700,
     selectedItemTextColor: Colors.white,
     brightness: Brightness.light,
+    mainFontFamily: 'Roboto', // Exemplo
+    headlineFontFamily: 'RobotoSlab', // Exemplo
   );
 
   // Definição do Tema Escuro (Exemplo - ajuste as cores conforme sua preferência)
@@ -93,15 +99,16 @@ class AppConfig {
     secondaryTextColor: Colors.white.withOpacity(0.70),
     appBarTextColor: Colors.white,
     buttonTextColor: Colors
-        .black87, // Texto do botão pode precisar de contraste no tema escuro
-    scaffoldBackgroundColor: const Color(
-      0xFF121212,
-    ), // Padrão Material Design Dark
-    leftPanelBackgroundColor: Colors.grey.shade800,
+        .white, // Ajustado para branco para melhor contraste com botões escuros
+    scaffoldBackgroundColor: Colors.black, // Fundo realmente PRETO
+    leftPanelBackgroundColor:
+        Colors.grey.shade900, // Um cinza bem escuro para o painel
     iconColor: Colors.white.withOpacity(0.75),
     selectedItemColor: Colors.blueGrey.shade500,
     selectedItemTextColor: Colors.white,
     brightness: Brightness.dark,
+    mainFontFamily: 'Roboto', // Exemplo
+    headlineFontFamily: 'RobotoSlab', // Exemplo
   );
 
   // Método para obter as cores do tema ativo (útil para acesso direto fora do ThemeData)
@@ -144,4 +151,6 @@ class AppConfig {
   Color get selectedItemColor => currentThemeColors.selectedItemColor;
   Color get selectedItemTextColor => currentThemeColors.selectedItemTextColor;
   Brightness get brightness => currentThemeColors.brightness;
+  String? get mainFontFamily => currentThemeColors.mainFontFamily;
+  String? get headlineFontFamily => currentThemeColors.headlineFontFamily;
 }

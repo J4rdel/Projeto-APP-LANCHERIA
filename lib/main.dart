@@ -90,15 +90,31 @@ ThemeData _buildThemeData(AppThemeColors themeColors, AppConfig appConfig) {
       ),
     ),
     textTheme: TextTheme(
-      bodyLarge: TextStyle(color: themeColors.primaryTextColor),
-      bodyMedium: TextStyle(color: themeColors.primaryTextColor),
+      bodyLarge: TextStyle(
+        color: themeColors.primaryTextColor,
+        fontFamily: themeColors.mainFontFamily, // Usar a fonte principal
+      ),
+      bodyMedium: TextStyle(
+        color: themeColors.primaryTextColor,
+        fontFamily: themeColors.mainFontFamily, // Usar a fonte principal
+      ),
       titleLarge: TextStyle(
         color: themeColors.primaryTextColor,
         fontWeight: FontWeight.bold,
+        fontFamily: themeColors.headlineFontFamily, // Usar a fonte de título
       ),
-      titleMedium: TextStyle(color: themeColors.primaryTextColor),
-      titleSmall: TextStyle(color: themeColors.secondaryTextColor),
-      labelLarge: TextStyle(color: themeColors.buttonTextColor),
+      titleMedium: TextStyle(
+        color: themeColors.primaryTextColor,
+        fontFamily: themeColors.headlineFontFamily, // Usar a fonte de título
+      ),
+      titleSmall: TextStyle(
+        color: themeColors.secondaryTextColor,
+        fontFamily: themeColors.mainFontFamily,
+      ),
+      labelLarge: TextStyle(
+        color: themeColors.buttonTextColor,
+        fontFamily: themeColors.mainFontFamily,
+      ),
     ),
     iconTheme: IconThemeData(color: themeColors.iconColor),
     listTileTheme: ListTileThemeData(

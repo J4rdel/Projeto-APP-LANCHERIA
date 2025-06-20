@@ -1,3 +1,19 @@
+// Antes (exemplo hipotético):
+// import 'package:flutter/material.dart';
+//
+// class MinhaContaPage extends StatelessWidget {
+//   const MinhaContaPage({super.key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('Minha Conta')),
+//       body: Center(child: Text('Conteúdo da Minha Conta')),
+//     );
+//   }
+// }
+
+// Depois (exemplo hipotético):
 import 'package:flutter/material.dart';
 
 class MinhaContaPage extends StatelessWidget {
@@ -5,17 +21,19 @@ class MinhaContaPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Minha Conta'), // backgroundColor e foregroundColor virão do tema
-      ),
-      body: Center( // Mantém o Center para o layout do conteúdo
-        child: Text(
-          'Aqui você verá seus dados e pedidos!',
-          style: TextStyle(fontSize: 20, color: Colors.grey),
-          // Para usar a cor do tema: Theme.of(context).textTheme.bodyMedium?.color
-        ),
-      ),
-    );
+    // Retorna apenas o conteúdo principal da página
+    return const Center(child: Text('Conteúdo da Minha Conta'));
+    // Se precisar de mais estrutura ou rolagem, use Column, SingleChildScrollView, etc.
+    // Exemplo:
+    // return SingleChildScrollView(
+    //   padding: const EdgeInsets.all(16.0),
+    //   child: Column(
+    //     crossAxisAlignment: CrossAxisAlignment.start,
+    //     children: [
+    //       Text('Detalhes do Usuário', style: Theme.of(context).textTheme.titleLarge),
+    //       // ... outros widgets ...
+    //     ],
+    //   ),
+    // );
   }
 }

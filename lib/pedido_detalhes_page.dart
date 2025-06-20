@@ -18,7 +18,8 @@ class _PedidoDetalhesPageState extends State<PedidoDetalhesPage> {
   @override
   void initState() {
     super.initState();
-    _selectedStatus = widget.pedido.status; // Inicializa com o status atual do pedido
+    _selectedStatus =
+        widget.pedido.status; // Inicializa com o status atual do pedido
   }
 
   @override
@@ -52,9 +53,13 @@ class _PedidoDetalhesPageState extends State<PedidoDetalhesPage> {
                 itemBuilder: (context, index) {
                   final itemPedido = widget.pedido.itens[index];
                   return ListTile(
-                    title: Text(itemPedido.lanche.nome),
-                    subtitle: Text('Quantidade: ${itemPedido.quantidade}  ${itemPedido.observacoes != null ? '(${itemPedido.observacoes})': ''}'),
-                    trailing: Text('R\$ ${itemPedido.subtotal.toStringAsFixed(2)}'),
+                    title: Text(itemPedido.produto.nome),
+                    subtitle: Text(
+                      'Quantidade: ${itemPedido.quantidade}  ${itemPedido.observacoes != null ? '(${itemPedido.observacoes})' : ''}',
+                    ),
+                    trailing: Text(
+                      'R\$ ${itemPedido.subtotal.toStringAsFixed(2)}',
+                    ),
                   );
                 },
               ),
@@ -64,7 +69,11 @@ class _PedidoDetalhesPageState extends State<PedidoDetalhesPage> {
               alignment: Alignment.centerRight,
               child: Text(
                 'Total: R\$ ${widget.pedido.valorTotal.toStringAsFixed(2)}',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.deepOrange),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepOrange,
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -84,16 +93,15 @@ class _PedidoDetalhesPageState extends State<PedidoDetalhesPage> {
               iconSize: 24,
               elevation: 16,
               style: const TextStyle(color: Colors.deepPurple, fontSize: 16),
-              underline: Container(
-                height: 2,
-                color: Colors.deepOrangeAccent,
-              ),
+              underline: Container(height: 2, color: Colors.deepOrangeAccent),
               onChanged: (StatusPedido? newValue) {
                 setState(() {
                   _selectedStatus = newValue!;
                 });
               },
-              items: StatusPedido.values.map<DropdownMenuItem<StatusPedido>>((StatusPedido status) {
+              items: StatusPedido.values.map<DropdownMenuItem<StatusPedido>>((
+                StatusPedido status,
+              ) {
                 return DropdownMenuItem<StatusPedido>(
                   value: status,
                   child: Text(status.displayName), // Usando extensão
@@ -105,13 +113,22 @@ class _PedidoDetalhesPageState extends State<PedidoDetalhesPage> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  final gerenciador = Provider.of<GerenciadorPedidos>(context, listen: false);
-                  widget.pedido.atualizarStatus(_selectedStatus); // Atualiza o status no objeto Pedido
-                  gerenciador.updatePedido(widget.pedido); // Notifica o gerenciador para reconstruir a lista
+                  final gerenciador = Provider.of<GerenciadorPedidos>(
+                    context,
+                    listen: false,
+                  );
+                  widget.pedido.atualizarStatus(
+                    _selectedStatus,
+                  ); // Atualiza o status no objeto Pedido
+                  gerenciador.updatePedido(
+                    widget.pedido,
+                  ); // Notifica o gerenciador para reconstruir a lista
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Status do Pedido #${widget.pedido.id} atualizado para ${_selectedStatus.displayName}!'), // Usando extensão
+                      content: Text(
+                        'Status do Pedido #${widget.pedido.id} atualizado para ${_selectedStatus.displayName}!',
+                      ), // Usando extensão
                       backgroundColor: Colors.green,
                     ),
                   );

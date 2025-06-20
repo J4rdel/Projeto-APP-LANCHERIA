@@ -26,7 +26,23 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/logo.png # Se a logo estiver aqui
-    # Adicione o caminho da sua logo principal também, ex: 'assets/logo_padrao.png'
-
-
+    - assets/images/logo_padrao.png
+    # - assets/images/x_salada.png
+    # - assets/images/x_bacon.png
+    # - assets/images/frango_crispy.png
+    # - assets/images/vegetariano.png
+    # - assets/images/kids_lanche.png
+    # - assets/images/x_tudo.png
+    # - assets/images/batata_frita.png
+    # - assets/images/refrigerante_lata.png
+    # - assets/images/suco_laranja.png
+    # - assets/images/suco_natural.png # Imagem genérica para sucos, se usada
+    # - assets/images/agua_mineral.png
+    # - assets/images/heineken.png
+    # - assets/images/cerveja_long_neck.png # Imagem genérica para cervejas, se usada
+    # - assets/images/suco_morango.png
+    # - assets/images/pudim.png
+    # - assets/images/brownie_sorvete.png
+    # - assets/images/mousse_maracuja.png
+    # - assets/images/petit_gateau.png
+    # Adicione quaisquer outras imagens que você tenha em assets/images/

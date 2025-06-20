@@ -36,7 +36,10 @@ class GerenciamentoPedidosPage extends StatelessWidget {
                       backgroundColor: pedido.status.color, // Usando extensão
                       child: Text(
                         pedido.id.substring(3), // Ex: "001" de "PED001"
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     title: Text(
@@ -46,17 +49,27 @@ class GerenciamentoPedidosPage extends StatelessWidget {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Status: ${pedido.status.displayName}'), // Usando extensão
-                        Text('Total: R\$ ${pedido.valorTotal.toStringAsFixed(2)}'),
-                        Text('Itens: ${pedido.itens.map((itemPedido) => itemPedido.lanche.nome).join(', ')}'), // Corrigido para acessar lanche.nome
+                        Text(
+                          'Status: ${pedido.status.displayName}',
+                        ), // Usando extensão
+                        Text(
+                          'Total: R\$ ${pedido.valorTotal.toStringAsFixed(2)}',
+                        ),
+                        Text(
+                          'Itens: ${pedido.itens.map((itemPedido) => itemPedido.produto.nome).join(', ')}',
+                        ), // Corrigido para acessar produto.nome
                       ],
                     ),
-                    trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.grey,
+                    ),
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => PedidoDetalhesPage(pedido: pedido),
+                          builder: (context) =>
+                              PedidoDetalhesPage(pedido: pedido),
                         ),
                       );
                     },
