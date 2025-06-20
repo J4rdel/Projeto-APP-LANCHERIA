@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lancheria/app_config.dart';
 import 'package:lancheria/carrinho.dart';
 import 'package:lancheria/gerenciador_pedidos.dart';
-//import 'package:lancheria/item_carrinho.dart'; // Adicionando o import que faltava
+import 'package:lancheria/item_carrinho.dart'; // Adicionando o import que faltava
 import 'package:lancheria/pedido.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +25,10 @@ class CarrinhoPage extends StatelessWidget {
     }
 
     // Criar lista de ItemPedido a partir de ItemCarrinho
-    final List<ItemPedido> itensPedido = carrinho.itens.map((itemCarrinho) {
+    final List<ItemPedido> itensPedido = carrinho.itens.map<ItemPedido>((
+      ItemCarrinho itemCarrinho,
+    ) {
+      // Tipo explícito para itemCarrinho
       return ItemPedido(
         produto: itemCarrinho.produto,
         quantidade: itemCarrinho.quantidade,

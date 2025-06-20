@@ -68,10 +68,16 @@ class _DrinksPageState extends State<DrinksPage> {
                         child: Image.asset(
                           drink.imagemUrl!,
                           fit: BoxFit.cover,
-                          errorBuilder: (ctx, err, st) => const Icon(
-                            Icons.local_drink,
+                          errorBuilder: (ctx, err, st) => Icon(
+                            Icons
+                                .broken_image, // Ou Icons.local_drink se preferir
                             size: 50,
-                          ), // Ícone de fallback maior
+                            color:
+                                Theme.of(
+                                  context,
+                                ).iconTheme.color?.withOpacity(0.6) ??
+                                Colors.grey,
+                          ),
                         ),
                       )
                     : Icon(

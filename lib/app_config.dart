@@ -60,6 +60,9 @@ class AppConfig {
   String apiKey1 = 'SUA_API_KEY_1_AQUI';
   String apiKey2 = 'SUA_API_KEY_2_AQUI';
 
+  // Senha/PIN mestre para o gerente realizar configurações críticas (como mudar mesa)
+  String gerenteMasterPin = '1234'; // Mantenha seguro em produção!
+
   // --- FONTES DE DADOS PARA PRODUTOS ---
   // Inicialmente, apontam para os dados mockados.
   // No futuro, você pode mudar para:

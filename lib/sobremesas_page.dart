@@ -73,8 +73,15 @@ class _SobremesasPageState extends State<SobremesasPage> {
                         child: Image.asset(
                           sobremesa.imagemUrl!,
                           fit: BoxFit.cover,
-                          errorBuilder: (ctx, err, st) =>
-                              const Icon(Icons.cake, size: 50),
+                          errorBuilder: (ctx, err, st) => Icon(
+                            Icons.broken_image, // Ou Icons.cake se preferir
+                            size: 50,
+                            color:
+                                Theme.of(
+                                  context,
+                                ).iconTheme.color?.withOpacity(0.6) ??
+                                Colors.grey,
+                          ),
                         ),
                       )
                     : Icon(

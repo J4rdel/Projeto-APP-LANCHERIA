@@ -3,19 +3,22 @@ import 'package:provider/provider.dart';
 import 'home_page.dart';
 import 'carrinho.dart';
 import 'gerenciador_pedidos.dart'; // Adicionado
-import 'package:firebase_core/firebase_core.dart'; // Importar Firebase Core
-import 'firebase_options.dart'; // Importar as opções de configuração do Firebase
+//import 'package:firebase_core/firebase_core.dart'; // Importar Firebase Core
+//import 'firebase_options.dart'; // Importar as opções de configuração do Firebase
 import 'app_config.dart'; // Importar AppConfig
 import 'theme_manager.dart'; // Importar ThemeManager
+import 'auth_manager.dart'; // Importar AuthManager
+import 'user_role.dart'; // Importar UserRole
+import 'logIn_page.dart'; // Corrigido para corresponder ao nome do arquivo
 
 void main() async {
   // 1. Transforme main em async
   WidgetsFlutterBinding.ensureInitialized(); // 2. Garanta que os bindings do Flutter estão inicializados
-  await Firebase.initializeApp(
-    // 3. Inicialize o Firebase
-    options: DefaultFirebaseOptions
-        .currentPlatform, // Use as opções geradas pelo FlutterFire CLI
-  );
+  // await Firebase.initializeApp( // TEMPORARIAMENTE COMENTADO PARA TESTES SEM FIREBASE CONFIGURADO
+  //   // 3. Inicialize o Firebase
+  //   options: DefaultFirebaseOptions
+  //       .currentPlatform, // Use as opções geradas pelo FlutterFire CLI
+  // );
 
   // Carrega o ThemeMode salvo antes de rodar o app
   final initialThemeMode = await ThemeManager.loadThemeMode();
@@ -41,6 +44,9 @@ class LancheriaApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => Carrinho()),
         ChangeNotifierProvider(create: (context) => GerenciadorPedidos()),
         ChangeNotifierProvider(
+          create: (context) => AuthManager(),
+        ), // Adicionar AuthManager
+        ChangeNotifierProvider(
           create: (context) => ThemeManager(
             initialThemeMode,
           ), // Corrigido: Acessar initialThemeMode diretamente
@@ -49,8 +55,10 @@ class LancheriaApp extends StatelessWidget {
       child: Consumer<ThemeManager>(
         // Usar Consumer para reconstruir MaterialApp na mudança de tema
         builder: (context, themeManager, child) {
-          final AppConfig appConfig = AppConfig
-              .instance; // Pode pegar a instância aqui se precisar para o title
+          // Consumir AuthManager para decidir a tela inicial
+          final authManager = Provider.of<AuthManager>(context, listen: true);
+          final AppConfig appConfig = AppConfig.instance;
+
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: appConfig.establishmentName,
@@ -64,7 +72,12 @@ class LancheriaApp extends StatelessWidget {
             ),
             themeMode:
                 themeManager.themeMode, // Usar o themeMode do ThemeManager
-            home: const HomePage(),
+            home:
+                authManager.isDeviceConfiguredAsTable ||
+                    (authManager.isUserLoggedIn &&
+                        authManager.currentRole != UserRole.none)
+                ? const HomePage()
+                : const LoginPage(), // Decide a tela inicial
           );
         },
       ),
@@ -131,17 +144,13 @@ ThemeData _buildThemeData(AppThemeColors themeColors, AppConfig appConfig) {
       primary: themeColors.primaryColor,
       secondary:
           themeColors.accentColor, // accentColor é o antigo nome para secondary
-      surface:
-          themeColors.scaffoldBackgroundColor, // Usado por Cards, Dialogs, etc.
-      background: themeColors.scaffoldBackgroundColor,
+      surface: themeColors.scaffoldBackgroundColor,
       error: Colors.red.shade700, // Defina uma cor de erro padrão
       onPrimary: themeColors
           .appBarTextColor, // Cor do texto/ícones sobre a cor primária
       onSecondary: themeColors
           .buttonTextColor, // Cor do texto/ícones sobre a cor secundária
       onSurface: themeColors
-          .primaryTextColor, // Cor do texto/ícones sobre a cor de superfície
-      onBackground: themeColors
           .primaryTextColor, // Cor do texto/ícones sobre a cor de fundo
       onError: Colors.white, // Cor do texto/ícones sobre a cor de erro
       brightness: themeColors.brightness,
