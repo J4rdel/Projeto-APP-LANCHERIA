@@ -3,6 +3,8 @@ import 'package:lancheria/auth_manager.dart';
 import 'package:lancheria/home_page.dart'; // Adicione esta linha (ajuste o caminho se necessário)
 import 'package:lancheria/user_role.dart'; // Adicionar este import
 import 'package:lancheria/gerenciamento_pedidos_page.dart'; // Importar a tela de gerenciamento de pedidos
+import 'package:lancheria/status_mesas_page.dart'; // Importar a nova tela de status das mesas
+// import 'package:lancheria/gerenciamento_cardapio_page.dart'; // Descomente quando criar esta página
 import 'package:provider/provider.dart';
 
 enum _PageMode {
@@ -270,6 +272,32 @@ class _LoginPageState extends State<LoginPage> {
                         );
                       },
                     ),
+                    _buildManagerOptionButton(
+                      icon: Icons
+                          .table_restaurant_outlined, // Ícone para status das mesas
+                      label: 'STATUS DAS MESAS',
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const StatusMesasPage(
+                              totalMesas: 25,
+                            ), // Defina o total de mesas
+                          ),
+                        );
+                      },
+                    ),
+                    // _buildManagerOptionButton(
+                    //   icon: Icons.edit_document, // Ícone para gerenciar cardápio
+                    //   label: 'GERENCIAR CARDÁPIO',
+                    //   onPressed: () {
+                    //     // Navigator.of(context).push(
+                    //     //   MaterialPageRoute(
+                    //     //     builder: (context) => const GerenciamentoCardapioPage(), // Crie esta página
+                    //     //   ),
+                    //     // );
+                    //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gerenciar Cardápio - A implementar')));
+                    //   },
+                    // ),
                     _buildManagerOptionButton(
                       icon: Icons.storefront, // Ícone para menu do app
                       label: 'IR PARA MENU DO APP',
