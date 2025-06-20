@@ -73,11 +73,13 @@ class LancheriaApp extends StatelessWidget {
             themeMode:
                 themeManager.themeMode, // Usar o themeMode do ThemeManager
             home:
-                authManager.isDeviceConfiguredAsTable ||
+                authManager
+                        .isDeviceConfiguredAsTable || // Se o dispositivo está configurado como mesa
                     (authManager.isUserLoggedIn &&
-                        authManager.currentRole != UserRole.none)
-                ? const HomePage()
-                : const LoginPage(), // Decide a tela inicial
+                        authManager.currentRole ==
+                            UserRole.suporte) // Ou se é um suporte logado
+                ? const HomePage() // Então vai para HomePage
+                : const LoginPage(), // Caso contrário, LoginPage (isso inclui gerente que precisa ver opções, ou ninguém logado)
           );
         },
       ),

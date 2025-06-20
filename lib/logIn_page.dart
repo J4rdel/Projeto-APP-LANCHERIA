@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lancheria/auth_manager.dart';
+import 'package:lancheria/home_page.dart'; // Adicione esta linha (ajuste o caminho se necessário)
 import 'package:lancheria/user_role.dart'; // Adicionar este import
+import 'package:lancheria/gerenciamento_pedidos_page.dart'; // Importar a tela de gerenciamento de pedidos
 import 'package:provider/provider.dart';
 
 enum _PageMode {
@@ -28,6 +30,24 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _isLoading = false;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    // Adicionado para verificar se o gerente já está logado ao entrar na LoginPage
+    // e se não há mesa configurada, para ir direto para as opções do gerente.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authManager = Provider.of<AuthManager>(context, listen: false);
+      if (authManager.isUserLoggedIn &&
+          authManager.currentRole == UserRole.gerente &&
+          !authManager.isDeviceConfiguredAsTable &&
+          _currentMode == _PageMode.loginForm) {
+        setState(() {
+          _currentMode = _PageMode.managerOptions;
+        });
+      }
+    });
+  }
 
   void _toggleLoginRole() {
     setState(() {
@@ -137,6 +157,40 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  Widget _buildManagerOptionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+    Color? backgroundColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor ?? Theme.of(context).primaryColor,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        onPressed: onPressed,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 48),
+            const SizedBox(height: 12),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authManager = Provider.of<AuthManager>(context);
@@ -204,13 +258,37 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 12),
                   ],
                   if (_currentMode == _PageMode.managerOptions) ...[
-                    Text(
-                      'Gerente Logado: ${authManager.currentUser?.nome ?? ""}',
-                      style: Theme.of(context).textTheme.titleLarge,
-                      textAlign: TextAlign.center,
+                    _buildManagerOptionButton(
+                      icon: Icons.receipt_long, // Ícone para gerenciar pedidos
+                      label: 'GERENCIAR PEDIDOS',
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const GerenciamentoPedidosPage(),
+                          ),
+                        );
+                      },
                     ),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
+                    _buildManagerOptionButton(
+                      icon: Icons.storefront, // Ícone para menu do app
+                      label: 'IR PARA MENU DO APP',
+                      onPressed: () {
+                        // Navega para HomePage, substituindo a LoginPage.
+                        // O AuthManager já está com o estado de gerente logado.
+                        // A HomePage precisará lidar com a exibição para um gerente
+                        // que não está operando uma mesa específica.
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => const HomePage(),
+                          ),
+                          (Route<dynamic> route) => false,
+                        );
+                      },
+                    ),
+                    _buildManagerOptionButton(
+                      icon: Icons.tablet_android, // Ícone para selecionar mesa
+                      label: 'SELECIONAR MESA',
                       onPressed: () {
                         setState(() {
                           _currentMode = _PageMode.configureTableForm;
@@ -220,33 +298,17 @@ class _LoginPageState extends State<LoginPage> {
                               authManager.currentTableIdForDevice ?? "";
                         });
                       },
-                      child: const Text(
-                        'CONFIGURAR/ALTERAR MESA DO DISPOSITIVO',
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    OutlinedButton(
-                      onPressed: () {
-                        // O AuthManager já está com UserRole.gerente.
-                        // O Consumer no main.dart cuidará da navegação para HomePage.
-                        // Nenhuma ação extra é necessária aqui para navegar,
-                        // pois o estado do AuthManager já reflete o login do gerente.
-                        // A LoginPage será substituída pela HomePage.
-                      },
-                      child: const Text('ACESSAR GERENCIAMENTO DO APP'),
                     ),
                     const SizedBox(height: 16),
                     TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: Colors.redAccent,
+                        foregroundColor: Theme.of(context).colorScheme.error,
                       ),
                       onPressed: () async {
                         await authManager.logout(); // Desloga o gerente
                         setState(() {
-                          _currentMode =
-                              _PageMode.loginForm; // Volta para a tela de login
-                          _loginAsRole =
-                              UserRole.gerente; // Reseta para login de gerente
+                          _currentMode = _PageMode.loginForm;
+                          _loginAsRole = UserRole.gerente;
                         });
                       },
                       child: const Text('SAIR (Logout Gerente)'),
