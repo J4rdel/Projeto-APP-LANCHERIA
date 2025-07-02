@@ -60,38 +60,48 @@ class _DrinksPageState extends State<DrinksPage> {
                   vertical: 10.0,
                   horizontal: 16.0,
                 ), // Aumenta o padding vertical
-                leading: drink.imagemUrl != null && drink.imagemUrl!.isNotEmpty
-                    ? SizedBox(
-                        // Usar SizedBox para restringir o tamanho da imagem
-                        width: 80, // Largura aumentada
-                        height: 80, // Altura aumentada
-                        child: Image.asset(
-                          drink.imagemUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (ctx, err, st) => Icon(
-                            Icons
-                                .broken_image, // Ou Icons.local_drink se preferir
-                            size: 50,
-                            color:
-                                Theme.of(
-                                  context,
-                                ).iconTheme.color?.withOpacity(0.6) ??
-                                Colors.grey,
+                leading: SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: drink.imagemUrl.isNotEmpty
+                        // A API retorna uma URL, então usamos Image.network
+                        ? Image.network(
+                            drink.imagemUrl,
+                            fit: BoxFit.cover,
+                            // Widget a ser exibido enquanto a imagem está carregando
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.deepOrange,
+                                ),
+                              );
+                            },
+                            // Widget a ser exibido em caso de erro ao carregar a imagem
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(
+                                  Icons.local_drink,
+                                  size: 40,
+                                  color: Colors.grey,
+                                ),
+                          )
+                        // Caso a URL da imagem esteja vazia, exibe um ícone padrão
+                        : const Icon(
+                            Icons.local_drink,
+                            size: 40,
+                            color: Colors.grey,
                           ),
-                        ),
-                      )
-                    : Icon(
-                        Icons.local_drink,
-                        size: 50,
-                        color: Theme.of(
-                          context,
-                        ).iconTheme.color?.withOpacity(0.6),
-                      ), // Ícone maior
+                  ),
+                ),
                 title: Text(
                   drink.nome,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text(drink.descricao ?? 'Detalhes não disponíveis.'),
+                // O campo 'descricao' no modelo Drink não é nulo,
+                // então a verificação '??' não é necessária.
+                subtitle: Text(drink.descricao),
                 trailing: Text(
                   '$currency ${drink.preco.toStringAsFixed(2)}',
                   style: const TextStyle(

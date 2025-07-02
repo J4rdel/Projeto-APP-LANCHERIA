@@ -64,40 +64,44 @@ class _SobremesasPageState extends State<SobremesasPage> {
                   vertical: 10.0,
                   horizontal: 16.0,
                 ),
-                leading:
-                    sobremesa.imagemUrl != null &&
-                        sobremesa.imagemUrl!.isNotEmpty
-                    ? SizedBox(
-                        width: 80,
-                        height: 80,
-                        child: Image.asset(
-                          sobremesa.imagemUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (ctx, err, st) => Icon(
-                            Icons.broken_image, // Ou Icons.cake se preferir
-                            size: 50,
-                            color:
-                                Theme.of(
-                                  context,
-                                ).iconTheme.color?.withOpacity(0.6) ??
-                                Colors.grey,
-                          ),
-                        ),
-                      )
-                    : Icon(
-                        Icons.cake,
-                        size: 50,
-                        color: Theme.of(
-                          context,
-                        ).iconTheme.color?.withOpacity(0.6),
-                      ),
+                leading: SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: sobremesa.imagemUrl.isNotEmpty
+                        // A API retorna uma URL, então usamos Image.network
+                        ? Image.network(
+                            sobremesa.imagemUrl,
+                            fit: BoxFit.cover,
+                            // Widget a ser exibido enquanto a imagem está carregando
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.deepOrange,
+                                ),
+                              );
+                            },
+                            // Widget a ser exibido em caso de erro ao carregar a imagem
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(
+                                  Icons.cake,
+                                  size: 40,
+                                  color: Colors.grey,
+                                ),
+                          )
+                        // Caso a URL da imagem esteja vazia, exibe um ícone padrão
+                        : const Icon(Icons.cake, size: 40, color: Colors.grey),
+                  ),
+                ),
                 title: Text(
                   sobremesa.nome,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text(
-                  sobremesa.descricao ?? 'Detalhes não disponíveis.',
-                ),
+                // O campo 'descricao' no modelo Sobremesa não é nulo,
+                // então a verificação '??' não é necessária.
+                subtitle: Text(sobremesa.descricao),
                 trailing: Text(
                   '$currency ${sobremesa.preco.toStringAsFixed(2)}',
                   style: const TextStyle(

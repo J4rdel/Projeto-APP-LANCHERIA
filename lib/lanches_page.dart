@@ -62,38 +62,46 @@ class _LanchesPageState extends State<LanchesPage> {
                   vertical: 10.0,
                   horizontal: 16.0,
                 ), // Aumenta o padding vertical
-                leading:
-                    lanche.imagemUrl != null && lanche.imagemUrl!.isNotEmpty
-                    ? SizedBox(
-                        // Usar SizedBox para restringir o tamanho da imagem
-                        width: 80, // Largura aumentada
-                        height: 80, // Altura aumentada
-                        child: Image.asset(
-                          lanche.imagemUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (ctx, err, st) => Icon(
-                            Icons.broken_image, // Ou Icons.fastfood se preferir
-                            size: 50,
-                            color:
-                                Theme.of(
-                                  context,
-                                ).iconTheme.color?.withOpacity(0.6) ??
-                                Colors.grey,
+                leading: SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: lanche.imagemUrl.isNotEmpty
+                        // A API retorna uma URL, então usamos Image.network
+                        ? Image.network(
+                            lanche.imagemUrl,
+                            fit: BoxFit.cover,
+                            // Widget a ser exibido enquanto a imagem está carregando
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.deepOrange,
+                                ),
+                              );
+                            },
+                            // Widget a ser exibido em caso de erro ao carregar a imagem
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(
+                                  Icons.fastfood,
+                                  size: 40,
+                                  color: Colors.grey,
+                                ),
+                          )
+                        // Caso a URL da imagem esteja vazia, exibe um ícone padrão
+                        : const Icon(
+                            Icons.fastfood,
+                            size: 40,
+                            color: Colors.grey,
                           ),
-                        ),
-                      )
-                    : Icon(
-                        Icons.fastfood,
-                        size: 50,
-                        color: Theme.of(
-                          context,
-                        ).iconTheme.color?.withOpacity(0.6),
-                      ), // Ícone maior
+                  ),
+                ),
                 title: Text(
                   lanche.nome,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text(lanche.descricao ?? 'Detalhes não disponíveis.'),
+                subtitle: Text(lanche.descricao),
                 trailing: Text(
                   '$currency ${lanche.preco.toStringAsFixed(2)}',
                   style: const TextStyle(

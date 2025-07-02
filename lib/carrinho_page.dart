@@ -117,37 +117,38 @@ class CarrinhoPage extends StatelessWidget {
                           vertical: 4,
                         ),
                         child: ListTile(
-                          leading:
-                              (item.produto.imagemUrl != null &&
-                                  item.produto.imagemUrl!.isNotEmpty)
-                              ? Image.asset(
-                                  item
-                                      .produto
-                                      .imagemUrl!, // Usamos '!' porque já verificamos que não é nulo e não é vazio
-                                  width: 50,
-                                  height: 50,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (ctx, err, st) => Icon(
-                                    Icons
-                                        .broken_image, // Ícone alternativo para erro de carregamento
-                                    size: 50,
-                                    color:
-                                        Theme.of(
-                                          context,
-                                        ).iconTheme.color?.withOpacity(0.5) ??
-                                        Colors.grey,
-                                  ),
-                                )
-                              : Icon(
-                                  Icons
-                                      .image_not_supported, // Ícone para quando não há imagemUrl
-                                  size: 50,
-                                  color:
-                                      Theme.of(
-                                        context,
-                                      ).iconTheme.color?.withOpacity(0.5) ??
-                                      Colors.grey,
-                                ),
+                          leading: SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: item.produto.imagemUrl.isNotEmpty
+                                  ? Image.network(
+                                      item.produto.imagemUrl,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                            if (loadingProgress == null)
+                                              return child;
+                                            return const Center(
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2.0,
+                                              ),
+                                            );
+                                          },
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const Icon(
+                                                Icons.broken_image,
+                                                color: Colors.grey,
+                                              ),
+                                    )
+                                  : const Icon(
+                                      Icons.image_not_supported,
+                                      color: Colors.grey,
+                                    ),
+                            ),
+                          ),
                           title: Text(item.produto.nome),
                           subtitle: Text(
                             'Qtd: ${item.quantidade} x $currency ${item.produto.preco.toStringAsFixed(2)}',

@@ -1,26 +1,19 @@
+/// Uma classe base abstrata para representar qualquer item vendável na lancheria.
+///
+/// Usar uma classe base nos permite tratar Lanche, Drink e Sobremesa
+/// de forma polimórfica, simplificando lógicas como a do carrinho de compras.
 abstract class Produto {
-  final String id; // Identificador único para cada produto
+  final int id;
   final String nome;
+  final String descricao;
   final double preco;
-  final String? descricao;
-  final String? imagemUrl;
+  final String imagemUrl;
 
   Produto({
     required this.id,
     required this.nome,
+    required this.descricao,
     required this.preco,
-    this.descricao,
-    this.imagemUrl,
+    required this.imagemUrl,
   });
-
-  // Um método para facilitar a exibição do preço
-  String get precoFormatado => 'R\$ ${preco.toStringAsFixed(2)}';
-
-  // Sobrescrever equality e hashCode é importante se forem usados em Maps ou Sets
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Produto && runtimeType == other.runtimeType && id == other.id;
-  @override
-  int get hashCode => id.hashCode;
 }

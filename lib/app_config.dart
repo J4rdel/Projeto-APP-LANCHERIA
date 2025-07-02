@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lancheria/lanche.dart';
 import 'package:lancheria/drink.dart';
 import 'package:lancheria/sobremesa.dart';
-import 'package:lancheria/mock_data_service.dart';
+import 'package:lancheria/api_service.dart'; // Importe o novo serviço
 
 // Classe para encapsular as cores de um tema específico
 class AppThemeColors {
@@ -64,13 +64,10 @@ class AppConfig {
   String gerenteMasterPin = '1234'; // Mantenha seguro em produção!
 
   // --- FONTES DE DADOS PARA PRODUTOS ---
-  // Inicialmente, apontam para os dados mockados.
-  // No futuro, você pode mudar para:
-  // getLanches = ApiService.fetchLanchesFromApi;
-  Future<List<Lanche>> Function() getLanches = MockDataService.fetchLanches;
-  Future<List<Drink>> Function() getDrinks = MockDataService.fetchDrinks;
-  Future<List<Sobremesa>> Function() getSobremesas =
-      MockDataService.fetchSobremesas;
+  // Agora, apontam para os métodos do ApiService que buscam dados reais.
+  Future<List<Lanche>> Function() getLanches = ApiService.fetchLanches;
+  Future<List<Drink>> Function() getDrinks = ApiService.fetchDrinks;
+  Future<List<Sobremesa>> Function() getSobremesas = ApiService.fetchSobremesas;
 
   // --- CONFIGURAÇÃO DE TEMAS ---
   ThemeMode activeThemeMode =
