@@ -6,24 +6,20 @@ import 'package:lancheria/lanche.dart';
 import 'package:lancheria/sobremesa.dart';
 
 class ApiService {
-  // URL base da sua API no MockAPI
-  static const String _baseUrl =
-      'https://6864e5415b5d8d03397eba76.mockapi.io/produto/lanches';
+  // URL base correta do recurso no MockAPI
+  static const String _baseUrl = 'http://localhost:3000/produtos?categoria=';
 
-  // Mapeamento entre nome da categoria e o ID usado no MockAPI
+  // Mapeamento entre nome da categoria e o valor numérico usado no MockAPI
   static const Map<String, String> _categoriaMap = {
-    'lanches': '1',
-    'drinks': '2',
+    'lanches': '2',
+    'drinks': '1',
     'sobremesas': '3',
   };
 
-  /// Método genérico privado para buscar dados da API.
-  ///
-  /// [categoriaNome] é o nome da categoria, que será traduzido para o ID usado no MockAPI.
-  /// [fromJson] é a função que converte um item do JSON para um objeto Dart.
+  /// Método genérico para buscar dados da API com base na categoria.
   static Future<List<T>> _fetchData<T>(
     String categoriaNome,
-    T Function(Map<String, dynamic> json) fromJson,
+    T Function(Map<String, dynamic>) fromJson,
   ) async {
     final categoriaId = _categoriaMap[categoriaNome];
 
@@ -52,15 +48,12 @@ class ApiService {
     }
   }
 
-  /// Busca os lanches
   static Future<List<Lanche>> fetchLanches() =>
       _fetchData('lanches', Lanche.fromJson);
 
-  /// Busca os drinks
   static Future<List<Drink>> fetchDrinks() =>
       _fetchData('drinks', Drink.fromJson);
 
-  /// Busca as sobremesas
   static Future<List<Sobremesa>> fetchSobremesas() =>
       _fetchData('sobremesas', Sobremesa.fromJson);
 }
