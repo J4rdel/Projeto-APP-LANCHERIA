@@ -32,6 +32,7 @@ class CarrinhoPage extends StatelessWidget {
       return ItemPedido(
         produto: itemCarrinho.produto,
         quantidade: itemCarrinho.quantidade,
+        opcionaisSelecionados: itemCarrinho.opcionaisSelecionados,
       );
     }).toList();
 
@@ -150,8 +151,20 @@ class CarrinhoPage extends StatelessWidget {
                             ),
                           ),
                           title: Text(item.produto.nome),
-                          subtitle: Text(
-                            'Qtd: ${item.quantidade} x $currency ${item.produto.preco.toStringAsFixed(2)}',
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Qtd: ${item.quantidade} x $currency ${item.precoUnitarioComAdicionais.toStringAsFixed(2)}',
+                              ),
+                              if (item.opcionaisSelecionados.isNotEmpty)
+                                Text(
+                                  'Adicionais: ${item.opcionaisSelecionados.map((o) => o.nome).join(', ')}',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade600),
+                                ),
+                            ],
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -168,7 +181,7 @@ class CarrinhoPage extends StatelessWidget {
                                   color: Colors.orange,
                                 ),
                                 onPressed: () {
-                                  carrinho.removerUnidade(item.produto);
+                                  carrinho.removerUnidade(item);
                                 },
                               ),
                               IconButton(
@@ -177,9 +190,7 @@ class CarrinhoPage extends StatelessWidget {
                                   color: Colors.red,
                                 ),
                                 onPressed: () {
-                                  carrinho.removerProdutoCompletamente(
-                                    item.produto,
-                                  );
+                                  carrinho.removerProdutoCompletamente(item);
                                 },
                               ),
                             ],

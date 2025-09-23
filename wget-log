@@ -1,0 +1,6 @@
+--2025-09-23 13:34:37--  https://file.notion.so/f/f/64e98074-bb4a-4a4c-921f-b909a58d0a5f/49c64626-eb37-41c4-8365-6171e4f5b8c2/lanches.json?table=block
+Resolvendo file.notion.so (file.notion.so)... 2600:9000:28b7:3800:13:cbc0:fdc0:93a1, 2600:9000:28b7:f800:13:cbc0:fdc0:93a1, 2600:9000:28b7:2800:13:cbc0:fdc0:93a1, ...
+Conectando-se a file.notion.so (file.notion.so)|2600:9000:28b7:3800:13:cbc0:fdc0:93a1|:443... conectado.
+A requisição HTTP foi enviada, aguardando resposta... 400 Bad Request
+2025-09-23 13:34:37 ERRO 400: Bad Request.
+

@@ -1,17 +1,34 @@
 // lib/models/pedido.dart
 import 'package:lancheria/produto.dart'; // Importar Produto
 import 'package:flutter/material.dart'; // Necessário para a cor
+import 'package:lancheria/opcional.dart';
 
 enum StatusPedido { pendente, preparando, aCaminho, entregue, cancelado }
 
 class ItemPedido {
   final Produto produto;
   int quantidade;
+  final List<Opcional> opcionaisSelecionados;
   String? observacoes; // Ex: "Sem cebola"
 
-  ItemPedido({required this.produto, this.quantidade = 1, this.observacoes});
+  ItemPedido({
+    required this.produto,
+    this.quantidade = 1,
+    this.opcionaisSelecionados = const [],
+    this.observacoes,
+  });
 
-  double get subtotal => produto.preco * quantidade;
+  /// Retorna o somatório do preço de todos os adicionais selecionados.
+  double get precoAdicionais {
+    return opcionaisSelecionados.fold(
+        0.0, (sum, item) => sum + item.precoAdicional);
+  }
+
+  /// Retorna o preço de uma unidade do produto com seus adicionais.
+  double get precoUnitarioComAdicionais => produto.preco + precoAdicionais;
+
+  /// Retorna o subtotal (preço unitário com adicionais * quantidade).
+  double get subtotal => precoUnitarioComAdicionais * quantidade;
 }
 
 class Pedido {

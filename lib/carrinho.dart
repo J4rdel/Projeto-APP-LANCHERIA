@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:lancheria/item_carrinho.dart';
 import 'package:lancheria/produto.dart';
+import 'package:lancheria/opcional.dart';
 
 class Carrinho with ChangeNotifier {
   final List<ItemCarrinho> _itens = [];
@@ -23,34 +24,46 @@ class Carrinho with ChangeNotifier {
     return total;
   }
 
-  void adicionarItem(Produto produto) {
-    // Verifica se o item já existe no carrinho
-    final index = _itens.indexWhere((item) => item.produto.id == produto.id);
+  void adicionarItem(Produto produto, {List<Opcional> opcionais = const []}) {
+    // Procura por um item idêntico (mesmo produto e mesmos adicionais)
+    final index = _itens.indexWhere((item) {
+      if (item.produto.id != produto.id) return false;
+
+      // Compara os adicionais selecionados.
+      // A ordem não importa, então usamos Sets.
+      final idsAdicionaisAtuais =
+          item.opcionaisSelecionados.map((o) => o.id).toSet();
+      final idsNovosAdicionais = opcionais.map((o) => o.id).toSet();
+
+      return setEquals(idsAdicionaisAtuais, idsNovosAdicionais);
+    });
 
     if (index >= 0) {
-      // Se existe, incrementa a quantidade
+      // Se um item idêntico já existe, apenas incrementa a quantidade
       _itens[index].quantidade++;
     } else {
-      // Se não existe, adiciona como um novo ItemCarrinho
-      _itens.add(ItemCarrinho(produto: produto, quantidade: 1));
+      // Caso contrário, adiciona como um novo item no carrinho
+      _itens.add(ItemCarrinho(
+        produto: produto,
+        quantidade: 1,
+        opcionaisSelecionados: opcionais,
+      ));
     }
     notifyListeners();
   }
 
-  void removerUnidade(Produto produto) {
-    final index = _itens.indexWhere((item) => item.produto.id == produto.id);
-    if (index >= 0) {
-      if (_itens[index].quantidade > 1) {
-        _itens[index].quantidade--;
-      } else {
-        _itens.removeAt(index);
-      }
-      notifyListeners();
+  void removerUnidade(ItemCarrinho item) {
+    if (item.quantidade > 1) {
+      item.quantidade--;
+    } else {
+      // Se a quantidade for 1, remove o item completamente
+      _itens.remove(item);
     }
+    notifyListeners();
   }
 
-  void removerProdutoCompletamente(Produto produto) {
-    _itens.removeWhere((item) => item.produto.id == produto.id);
+  void removerProdutoCompletamente(ItemCarrinho item) {
+    _itens.remove(item);
     notifyListeners();
   }
 
