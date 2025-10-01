@@ -4,6 +4,7 @@ import 'package:lancheria/home_page.dart'; // Adicione esta linha (ajuste o cami
 import 'package:lancheria/user_role.dart'; // Adicionar este import
 import 'package:lancheria/gerenciamento_pedidos_page.dart'; // Importar a tela de gerenciamento de pedidos
 import 'package:lancheria/status_mesas_page.dart'; // Importar a nova tela de status das mesas
+import 'package:lancheria/configuracoes_page.dart'; // Importar a nova tela de configurações
 // import 'package:lancheria/gerenciamento_cardapio_page.dart'; // Descomente quando criar esta página
 import 'package:provider/provider.dart';
 
@@ -325,6 +326,18 @@ class _LoginPageState extends State<LoginPage> {
                           _tableIdController.text =
                               authManager.currentTableIdForDevice ?? "";
                         });
+                      },
+                    ),
+                    _buildManagerOptionButton(
+                      icon: Icons.settings,
+                      label: 'CONFIGURAÇÕES DO APP',
+                      backgroundColor: Colors.blueGrey,
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const ConfiguracoesPage(),
+                          ),
+                        );
                       },
                     ),
                     const SizedBox(height: 16),

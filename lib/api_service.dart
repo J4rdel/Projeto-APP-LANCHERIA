@@ -6,8 +6,8 @@ import 'package:lancheria/lanche.dart';
 import 'package:lancheria/sobremesa.dart';
 
 class ApiService {
-  // URL base correta do recurso no MockAPI
-  static const String _baseUrl = 'http://localhost:3000/produtos?categoria=';
+  // URL base que pode ser configurada externamente.
+  static String baseUrl = 'http://localhost:3000';
 
   // Mapeamento entre nome da categoria e o valor numérico usado no MockAPI
   static const Map<String, String> _categoriaMap = {
@@ -27,9 +27,8 @@ class ApiService {
       throw Exception('Categoria "$categoriaNome" não está mapeada.');
     }
 
-    final uri = Uri.parse(
-      _baseUrl,
-    ).replace(queryParameters: {'categoria': categoriaId});
+    final fullUrl = '$baseUrl/produtos';
+    final uri = Uri.parse(fullUrl).replace(queryParameters: {'categoria': categoriaId});
 
     final response = await http.get(uri);
 

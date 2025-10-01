@@ -8,6 +8,7 @@ import 'gerenciador_pedidos.dart'; // Adicionado
 import 'app_config.dart'; // Importar AppConfig
 import 'theme_manager.dart'; // Importar ThemeManager
 import 'auth_manager.dart'; // Importar AuthManager
+import 'configuracoes_page.dart'; // Importar para usar o AppSettingsLoader
 import 'user_role.dart'; // Importar UserRole
 import 'logIn_page.dart'; // Corrigido para corresponder ao nome do arquivo
 
@@ -19,6 +20,9 @@ void main() async {
   //   options: DefaultFirebaseOptions
   //       .currentPlatform, // Use as opções geradas pelo FlutterFire CLI
   // );
+
+  // Carrega configurações personalizadas salvas pelo gerente
+  await AppSettingsLoader.applySavedSettingsToAppConfig();
 
   // Carrega o ThemeMode salvo antes de rodar o app
   final initialThemeMode = await ThemeManager.loadThemeMode();
@@ -59,27 +63,35 @@ class LancheriaApp extends StatelessWidget {
           final authManager = Provider.of<AuthManager>(context, listen: true);
           final AppConfig appConfig = AppConfig.instance;
 
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: appConfig.establishmentName,
-            theme: _buildThemeData(
-              AppConfig.lightThemeColors,
-              appConfig, // appConfig ainda é útil para _buildThemeData se ele usa outras configs
-            ), // Tema claro usa AppConfig.lightThemeColors
-            darkTheme: _buildThemeData(
-              AppConfig.darkThemeColors,
-              appConfig, // Tema escuro usa AppConfig.darkThemeColors
-            ),
-            themeMode:
-                themeManager.themeMode, // Usar o themeMode do ThemeManager
-            home:
-                authManager
-                        .isDeviceConfiguredAsTable || // Se o dispositivo está configurado como mesa
-                    (authManager.isUserLoggedIn &&
-                        authManager.currentRole ==
-                            UserRole.suporte) // Ou se é um suporte logado
-                ? const HomePage() // Então vai para HomePage
-                : const LoginPage(), // Caso contrário, LoginPage (isso inclui gerente que precisa ver opções, ou ninguém logado)
+          return FutureBuilder<List<ThemeData>>(
+            // Carrega os temas com base nas configurações salvas
+            future: Future.wait([
+              AppSettingsLoader.buildThemeDataFromSettings(_buildThemeData(AppConfig.lightThemeColors, appConfig), false),
+              AppSettingsLoader.buildThemeDataFromSettings(_buildThemeData(AppConfig.darkThemeColors, appConfig), true),
+            ]),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                // Mostra um loader enquanto os temas estão sendo construídos
+                return const MaterialApp(home: Scaffold(body: Center(child: CircularProgressIndicator())));
+              }
+
+              final lightTheme = snapshot.data![0];
+              final darkTheme = snapshot.data![1];
+
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: appConfig.establishmentName,
+                theme: lightTheme,
+                darkTheme: darkTheme,
+                themeMode: themeManager.themeMode, // Usar o themeMode do ThemeManager
+                home: authManager.isDeviceConfiguredAsTable || // Se o dispositivo está configurado como mesa
+                        (authManager.isUserLoggedIn &&
+                            authManager.currentRole ==
+                                UserRole.suporte) // Ou se é um suporte logado
+                    ? const HomePage() // Então vai para HomePage
+                    : const LoginPage(), // Caso contrário, LoginPage (isso inclui gerente que precisa ver opções, ou ninguém logado)
+          );
+            },
           );
         },
       ),

@@ -24,7 +24,7 @@ class Carrinho with ChangeNotifier {
     return total;
   }
 
-  void adicionarItem(Produto produto, {List<Opcional> opcionais = const []}) {
+  void adicionarItem(Produto produto, {int quantidade = 1, List<Opcional> opcionais = const []}) {
     // Procura por um item idêntico (mesmo produto e mesmos adicionais)
     final index = _itens.indexWhere((item) {
       if (item.produto.id != produto.id) return false;
@@ -40,12 +40,12 @@ class Carrinho with ChangeNotifier {
 
     if (index >= 0) {
       // Se um item idêntico já existe, apenas incrementa a quantidade
-      _itens[index].quantidade++;
+      _itens[index].quantidade += quantidade;
     } else {
       // Caso contrário, adiciona como um novo item no carrinho
       _itens.add(ItemCarrinho(
         produto: produto,
-        quantidade: 1,
+        quantidade: quantidade,
         opcionaisSelecionados: opcionais,
       ));
     }
