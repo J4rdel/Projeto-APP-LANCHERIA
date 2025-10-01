@@ -3,7 +3,6 @@ import 'package:lancheria/auth_manager.dart';
 import 'package:lancheria/home_page.dart'; // Adicione esta linha (ajuste o caminho se necessário)
 import 'package:lancheria/user_role.dart'; // Adicionar este import
 import 'package:lancheria/gerenciamento_pedidos_page.dart'; // Importar a tela de gerenciamento de pedidos
-import 'package:lancheria/status_mesas_page.dart'; // Importar a nova tela de status das mesas
 import 'package:lancheria/configuracoes_page.dart'; // Importar a nova tela de configurações
 // import 'package:lancheria/gerenciamento_cardapio_page.dart'; // Descomente quando criar esta página
 import 'package:provider/provider.dart';
@@ -269,20 +268,6 @@ class _LoginPageState extends State<LoginPage> {
                           MaterialPageRoute(
                             builder: (context) =>
                                 const GerenciamentoPedidosPage(),
-                          ),
-                        );
-                      },
-                    ),
-                    _buildManagerOptionButton(
-                      icon: Icons
-                          .table_restaurant_outlined, // Ícone para status das mesas
-                      label: 'STATUS DAS MESAS',
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const StatusMesasPage(
-                              totalMesas: 25,
-                            ), // Defina o total de mesas
                           ),
                         );
                       },
