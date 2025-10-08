@@ -25,7 +25,7 @@ class Drink extends Produto {
       nome: json['nome'] ?? '',
       descricao: json['descricao'] ?? '',
       preco: double.tryParse(json['preco'].toString()) ?? 0.0,
-      imagemUrl: json['imagem'] ?? '',
+      imagemUrl: json['imagem_url'] ?? '', // Corrigido para 'imagem_url' para consistência
       opcionais: opcionaisList,
     );
   }

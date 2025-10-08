@@ -259,31 +259,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 12),
                   ],
-                  if (_currentMode == _PageMode.managerOptions) ...[
-                    _buildManagerOptionButton(
-                      icon: Icons.receipt_long, // Ícone para gerenciar pedidos
-                      label: 'GERENCIAR PEDIDOS',
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const GerenciamentoPedidosPage(),
-                          ),
-                        );
-                      },
-                    ),
-                    // _buildManagerOptionButton(
-                    //   icon: Icons.edit_document, // Ícone para gerenciar cardápio
-                    //   label: 'GERENCIAR CARDÁPIO',
-                    //   onPressed: () {
-                    //     // Navigator.of(context).push(
-                    //     //   MaterialPageRoute(
-                    //     //     builder: (context) => const GerenciamentoCardapioPage(), // Crie esta página
-                    //     //   ),
-                    //     // );
-                    //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gerenciar Cardápio - A implementar')));
-                    //   },
-                    // ),
+                  if (_currentMode == _PageMode.managerOptions) ...[                    
                     _buildManagerOptionButton(
                       icon: Icons.storefront, // Ícone para menu do app
                       label: 'IR PARA MENU DO APP',

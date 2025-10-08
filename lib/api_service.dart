@@ -7,7 +7,10 @@ import 'package:lancheria/sobremesa.dart';
 
 class ApiService {
   // URL base que pode ser configurada externamente.
-  static String baseUrl = 'http://localhost:3000';
+  // static String baseUrl = 'http://localhost:3000'; // 'localhost' funciona apenas se o app e a API rodam na mesma máquina (ex: web, desktop).
+  // Para emuladores Android, use '10.0.2.2'.
+  // Para dispositivos físicos na mesma rede, use o IP da sua máquina (ex: 'http://192.168.1.10:3000').
+  static String baseUrl = 'http://10.0.2.2:3000'; // Use 'http://SEU_IP_AQUI:3000' para dispositivo físico.
 
   // Mapeamento entre nome da categoria e o valor numérico usado no MockAPI
   static const Map<String, String> _categoriaMap = {
