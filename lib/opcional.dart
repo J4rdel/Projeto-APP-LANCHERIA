@@ -15,7 +15,10 @@ class Opcional {
     return Opcional(
       id: json['id'] as int,
       nome: json['nome'] as String,
-      precoAdicional: double.parse(json['preco_adicional'].toString()),
+      // Torna a conversão mais segura, aceitando tanto números (double/int) quanto strings.
+      precoAdicional: (json['preco_adicional'] is String)
+          ? (double.tryParse(json['preco_adicional']) ?? 0.0)
+          : (json['preco_adicional'] as num).toDouble(),
     );
   }
 }

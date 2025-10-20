@@ -6,8 +6,33 @@
       "nome": "X-Burger Clássico",
       "descricao": "Pão, hambúrguer de 150g, queijo prato, alface, tomate e molho especial da casa.",
       "preco": 22.50,
-      "imagem_url": "https://conteudo.imguol.com.br/c/entretenimento/a0/2021/11/06/lanche-hamburguer-x-salada-1636227034415_v2_900x506.jpg",
+      "imagem_url": "https://www.sabornamesa.com.br/media/k2/items/cache/bf1e20a4462b71e3cc4cece2a8c96ac8_XL.jpg",
       "isCustomizable": true
+    },
+    {
+      "id": 99,
+      "categoria": 2,
+      "nome": "X-Burger Duplo Bacon",
+      "descricao": "Dois hambúrgueres suculentos, queijo cheddar, muito bacon, pão brioche e molho especial da casa.",
+      "preco": 32.50,
+      "imagem_url": "https://exemplo.com/imagem/x-duplo-bacon.png",
+      "opcionais": [
+        {
+          "id": 88,
+          "nome": "Cheddar Extra",
+          "preco_adicional": 3.00
+        },
+        {
+          "id": 89,
+          "nome": "Ovo",
+          "preco_adicional": 2.50
+        },
+        {
+          "id": 87,
+          "nome": "Cebola Caramelizada",
+          "preco_adicional": 4.00
+        }
+      ]
     },
     {
       "id": 102,
