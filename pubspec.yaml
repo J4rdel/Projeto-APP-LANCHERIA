@@ -1,0 +1,50 @@
+name: lancheria
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^3.13.1
+  cloud_firestore: ^5.6.8
+  firebase_auth: ^5.5.4
+  http: ^1.2.1 # Adicione esta linha
+  provider: ^6.1.2
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.2.3 # Verifique a versão mais recente no pub.dev
+  flutter_colorpicker: ^1.0.3
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/logo_padrao.png
+    # - assets/images/x_salada.png
+    # - assets/images/x_bacon.png
+    # - assets/images/frango_crispy.png
+    # - assets/images/vegetariano.png
+    # - assets/images/kids_lanche.png
+    # - assets/images/x_tudo.png
+    # - assets/images/batata_frita.png
+    # - assets/images/refrigerante_lata.png
+    # - assets/images/suco_laranja.png
+    # - assets/images/suco_natural.png # Imagem genérica para sucos, se usada
+    # - assets/images/agua_mineral.png
+    # - assets/images/heineken.png
+    # - assets/images/cerveja_long_neck.png # Imagem genérica para cervejas, se usada
+    # - assets/images/suco_morango.png
+    # - assets/images/pudim.png
+    # - assets/images/brownie_sorvete.png
+    # - assets/images/mousse_maracuja.png
+    # - assets/images/petit_gateau.png
+    # Adicione quaisquer outras imagens que você tenha em assets/images/

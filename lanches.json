@@ -1,0 +1,137 @@
+{
+  "produtos": [
+    {
+      "id": 101,
+      "categoria": 2,
+      "nome": "X-Burger Clássico",
+      "descricao": "Pão, hambúrguer de 150g, queijo prato, alface, tomate e molho especial da casa.",
+      "preco": 22.50,
+      "imagem_url": "https://www.sabornamesa.com.br/media/k2/items/cache/bf1e20a4462b71e3cc4cece2a8c96ac8_XL.jpg",
+      "opcionais": [
+        {
+          "id": 88,
+          "nome": "Cheddar Extra",
+          "preco_adicional": 3.00
+        },
+        {
+          "id": 89,
+          "nome": "Ovo",
+          "preco_adicional": 2.50
+        },
+        {
+          "id": 87,
+          "nome": "Cebola Caramelizada",
+          "preco_adicional": 4.00
+        }
+      ]
+    },
+    {
+      "id": 99,
+      "categoria": 2,
+      "nome": "X-Burger Duplo Bacon",
+      "descricao": "Dois hambúrgueres suculentos, queijo cheddar, muito bacon, pão brioche e molho especial da casa.",
+      "preco": 32.5,
+      "imagem_url": "https://www.sabornamesa.com.br/media/k2/items/cache/bf1e20a4462b71e3cc4cece2a8c96ac8_XL.jpg",
+      "opcionais": [
+        {
+          "id": 88,
+          "nome": "Cheddar Extra",
+          "preco_adicional": 3.00
+        },
+        {
+          "id": 89,
+          "nome": "Ovo",
+          "preco_adicional": 2.50
+        },
+        {
+          "id": 87,
+          "nome": "Cebola Caramelizada",
+          "preco_adicional": 4.00
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "categoria": 2,
+      "nome": "Duplo Bacon",
+      "descricao": "Pão, dois hambúrgueres de 150g, dobro de queijo cheddar, fatias de bacon crocante e cebola caramelizada.",
+      "preco": 28.90,
+      "imagem_url": "https://www.sabornamesa.com.br/media/k2/items/cache/bf1e20a4462b71e3cc4cece2a8c96ac8_XL.jpg",
+      "opcionais": [
+        {
+          "id": 88,
+          "nome": "Cheddar Extra",
+          "preco_adicional": 3.00
+        },
+        {
+          "id": 89,
+          "nome": "Ovo",
+          "preco_adicional": 2.50
+        },
+        {
+          "id": 87,
+          "nome": "Cebola Caramelizada",
+          "preco_adicional": 4.00
+        }
+      ]
+    },
+    {
+      "id": 201,
+      "categoria": 1,
+      "nome": "Refrigerante Lata",
+      "descricao": "Escolha entre Coca-Cola, Guaraná ou Fanta. (350ml)",
+      "preco": 6.00,
+      "imagem_url": "https://i.imgur.com/dJm2K3A.jpeg",
+      "opcionais": []
+    },
+    {
+      "id": 202,
+      "categoria": 1,
+      "nome": "Suco Natural de Laranja",
+      "descricao": "Feito na hora com laranjas frescas. (500ml)",
+      "preco": 9.50,
+      "imagem_url": "https://i.imgur.com/sCfaA4m.jpeg",
+      "opcionais": []
+    },
+    {
+      "id": 301,
+      "categoria": 3,
+      "nome": "Pudim de Leite",
+      "descricao": "Cremoso e com uma calda de caramelo perfeita. A sobremesa que abraça.",
+      "preco": 12.00,
+      "imagem_url": "https://i.imgur.com/bY2zUaG.jpeg",
+      "opcionais": [
+                {
+          "id": 501,
+          "nome": "Calda de Chocolate Extra",
+          "preco_adicional": 2.00
+        },
+        {
+          "id": 502,
+          "nome": "Granulado",
+          "preco_adicional": 1.50
+        }
+      ]
+    },
+    {
+      "id": 302,
+      "categoria": 3,
+      "nome": "Brownie com Sorvete",
+      "descricao": "Brownie de chocolate meio amargo quentinho servido com uma bola de sorvete de creme.",
+      "preco": 18.00,
+      "imagem_url": "https://i.imgur.com/TfE0f6w.jpeg",
+      "opcionais": [
+        {
+          "id": 501,
+          "nome": "Calda de Chocolate Extra",
+          "preco_adicional": 2.00
+        },
+        {
+          "id": 502,
+          "nome": "Granulado",
+          "preco_adicional": 1.50
+        }
+      ]
+    }
+  ]
+}
