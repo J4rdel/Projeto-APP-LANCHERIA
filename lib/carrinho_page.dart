@@ -4,16 +4,22 @@ import 'package:lancheria/carrinho.dart';
 import 'package:lancheria/gerenciador_pedidos.dart';
 import 'package:lancheria/item_carrinho.dart'; // Adicionando o import que faltava
 import 'package:lancheria/pedido.dart';
+import 'package:lancheria/api_service.dart'; // Importar ApiService
+import 'package:lancheria/auth_manager.dart'; // Importar AuthManager
 import 'package:provider/provider.dart';
 
 class CarrinhoPage extends StatelessWidget {
   const CarrinhoPage({super.key});
 
-  void _finalizarPedido(
+  Future<void> _finalizarPedido(
     BuildContext context,
     Carrinho carrinho,
     GerenciadorPedidos gerenciadorPedidos,
-  ) {
+  ) async {
+    final authManager = Provider.of<AuthManager>(context, listen: false);
+    final mesaId = authManager.mesaIdForDevice;
+    final mesaNumero = authManager.mesaNumeroForDevice;
+
     if (carrinho.itens.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -24,65 +30,113 @@ class CarrinhoPage extends StatelessWidget {
       return;
     }
 
-    // Criar lista de ItemPedido a partir de ItemCarrinho
-    final List<ItemPedido> itensPedido = carrinho.itens.map<ItemPedido>((
-      ItemCarrinho itemCarrinho,
-    ) {
-      // Tipo explícito para itemCarrinho
-      return ItemPedido(
-        produto: itemCarrinho.produto,
-        quantidade: itemCarrinho.quantidade,
-        opcionaisSelecionados: itemCarrinho.opcionaisSelecionados,
+    if (mesaId == null || mesaId.isEmpty || mesaNumero == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Tablet não está vinculado a uma mesa.'),
+          backgroundColor: Colors.red,
+        ),
       );
+      return;
+    }
+
+    final itensInvalidos = carrinho.itens
+        .where((i) => i.produto.id.trim().isEmpty || i.produto.id == '0' || i.quantidade <= 0)
+        .toList();
+    if (itensInvalidos.isNotEmpty) {
+      final nomes = itensInvalidos.map((e) => e.produto.nome).toSet().join(', ');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Não foi possível enviar: existe item com produtoId inválido ou quantidade <= 0 ($nomes).'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    final itensRequest = carrinho.itens.map<Map<String, dynamic>>((itemCarrinho) {
+      return {
+        'produtoId': itemCarrinho.produto.id,
+        'quantidade': itemCarrinho.quantidade,
+        'opcionaisIds': itemCarrinho.opcionaisSelecionados.map((o) => o.id).toList(),
+      };
     }).toList();
 
-    // Criar o Pedido
-    final novoPedido = Pedido(
-      // Gerar um ID único para o pedido (exemplo simples)
-      id: 'PED${DateTime.now().millisecondsSinceEpoch}',
-      idCliente: 'cliente_local_01', // Mock ID do cliente
-      itens: itensPedido,
-      valorTotal: carrinho.valorTotal,
-      dataHoraPedido: DateTime.now(),
-      status: StatusPedido.pendente, // Status inicial
-    );
+    try {
+      final pedidoCriado = await ApiService.postPedido(
+        mesaId: mesaId,
+        clienteId: 'tablet',
+        itens: itensRequest,
+      );
 
-    // Adicionar ao gerenciador de pedidos
-    gerenciadorPedidos.addPedido(novoPedido);
+      final List<ItemPedido> itensPedido = carrinho.itens.map<ItemPedido>((itemCarrinho) {
+        return ItemPedido(
+          produto: itemCarrinho.produto,
+          quantidade: itemCarrinho.quantidade,
+          opcionaisSelecionados: itemCarrinho.opcionaisSelecionados,
+        );
+      }).toList();
 
-    // Limpar o carrinho
-    carrinho.limparCarrinho();
+      final novoPedido = Pedido(
+        id: pedidoCriado.numero != null ? 'N${pedidoCriado.numero}' : 'PED${DateTime.now().millisecondsSinceEpoch}',
+        idCliente: 'Mesa $mesaNumero',
+        itens: itensPedido,
+        valorTotal: carrinho.valorTotal,
+        dataHoraPedido: pedidoCriado.dataHora,
+        status: StatusPedido.pendente,
+      );
 
-    // Mostrar confirmação
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Pedido Realizado!'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Seu pedido (ID: ${novoPedido.id}) foi enviado para o balcão.',
+      gerenciadorPedidos.addPedido(novoPedido);
+      carrinho.limparCarrinho();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Pedido enviado com sucesso.'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Pedido Realizado!'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Mesa: $mesaNumero'),
+              const SizedBox(height: 8),
+              Text('Pedido: ${pedidoCriado.numero ?? '-'}'),
+              const SizedBox(height: 8),
+              Text('Data/Hora: ${pedidoCriado.dataHora}'),
+              const SizedBox(height: 10),
+              Text(
+                'Valor Total: ${AppConfig.instance.currencySymbol} ${novoPedido.valorTotal.toStringAsFixed(2)}',
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(ctx).pop();
+              },
             ),
-            const SizedBox(height: 10),
-            Text(
-              'Valor Total: ${AppConfig.instance.currencySymbol} ${novoPedido.valorTotal.toStringAsFixed(2)}',
-            ),
-            const SizedBox(height: 10),
-            const Text('Obrigado pela preferência!'),
           ],
         ),
-        actions: [
-          TextButton(
-            child: const Text('OK'),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-          ),
-        ],
-      ),
-    );
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao enviar pedido para o PDV: $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
 
   @override
@@ -129,8 +183,9 @@ class CarrinhoPage extends StatelessWidget {
                                       fit: BoxFit.cover,
                                       loadingBuilder:
                                           (context, child, loadingProgress) {
-                                            if (loadingProgress == null)
+                                            if (loadingProgress == null) {
                                               return child;
+                                            }
                                             return const Center(
                                               child: CircularProgressIndicator(
                                                 strokeWidth: 2.0,

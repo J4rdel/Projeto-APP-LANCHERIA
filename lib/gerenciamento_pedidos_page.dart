@@ -28,6 +28,8 @@ class GerenciamentoPedidosPage extends StatelessWidget {
               itemCount: gerenciador.pedidos.length,
               itemBuilder: (context, index) {
                 final pedido = gerenciador.pedidos[index];
+                final matches = RegExp(r'(\d+)').allMatches(pedido.id).map((m) => m.group(1)).whereType<String>().toList();
+                final badge = matches.isNotEmpty ? matches.last : pedido.id;
                 return Card(
                   margin: const EdgeInsets.all(8.0),
                   elevation: 4,
@@ -35,7 +37,7 @@ class GerenciamentoPedidosPage extends StatelessWidget {
                     leading: CircleAvatar(
                       backgroundColor: pedido.status.color, // Usando extensão
                       child: Text(
-                        pedido.id.substring(3), // Ex: "001" de "PED001"
+                        badge,
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -43,7 +45,7 @@ class GerenciamentoPedidosPage extends StatelessWidget {
                       ),
                     ),
                     title: Text(
-                      'Pedido #${pedido.id}',
+                      'Pedido #$badge',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Column(

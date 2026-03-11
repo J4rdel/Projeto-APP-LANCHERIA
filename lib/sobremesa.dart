@@ -11,7 +11,6 @@ class Sobremesa extends Produto {
     required super.opcionais,
   });
 
-  /// Construtor factory para criar uma Sobremesa a partir de um JSON.
   factory Sobremesa.fromJson(Map<String, dynamic> json) {
     var opcionaisList = <Opcional>[];
     if (json['opcionais'] != null && json['opcionais'] is List) {
@@ -22,11 +21,11 @@ class Sobremesa extends Produto {
     }
 
     return Sobremesa(
-      id: json['id'] as int,
-      nome: json['nome'] as String,
-      descricao: json['descricao'] as String,
-      preco: double.parse(json['preco'].toString()),
-      imagemUrl: json['imagem_url'] as String,
+      id: (json['id'] ?? json['produto_id'] ?? json['produtoId'] ?? '').toString(),
+      nome: json['nome'] ?? '',
+      descricao: json['descricao'] ?? '',
+      preco: double.tryParse(json['preco'].toString()) ?? 0.0,
+      imagemUrl: json['imagem_url'] ?? json['imagemUrl'] ?? '',
       opcionais: opcionaisList,
     );
   }

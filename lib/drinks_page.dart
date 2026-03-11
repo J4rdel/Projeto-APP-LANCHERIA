@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:lancheria/carrinho.dart';
 import 'package:lancheria/produto.dart';
 import 'package:lancheria/opcional.dart';
+import 'package:lancheria/api_service.dart'; // Importar ApiService
 import 'product_card.dart'; // Importa o novo widget de card
 
 class DrinksPage extends StatefulWidget {
@@ -55,7 +56,7 @@ class _DrinksPageState extends State<DrinksPage> {
                           borderRadius: BorderRadius.circular(12.0),
                           child: produto.imagemUrl.isNotEmpty
                               ? Image.network(
-                                  produto.imagemUrl,
+                                  ApiService.getFullImageUrl(produto.imagemUrl),
                                   fit: BoxFit.cover,
                                   loadingBuilder:
                                       (context, child, loadingProgress) {
@@ -135,7 +136,7 @@ class _DrinksPageState extends State<DrinksPage> {
                                 contentPadding: EdgeInsets.zero,
                                 dense: true,
                               );
-                            }).toList(),
+                            }),
                           ],
                         ],
                       ),
@@ -196,7 +197,7 @@ class _DrinksPageState extends State<DrinksPage> {
             return GestureDetector(
               onTap: () => _showProductPreview(context, drink),
               child: ProductCard(
-                imageUrl: drink.imagemUrl,
+                imageUrl: ApiService.getFullImageUrl(drink.imagemUrl),
                 name: drink.nome,
                 description: drink.descricao,
                 price: '$currency ${drink.preco.toStringAsFixed(2)}',
@@ -215,10 +216,11 @@ class _DrinksPageState extends State<DrinksPage> {
       {List<Opcional> opcionais = const []}) {
     Provider.of<Carrinho>(context, listen: false)
         .adicionarItem(produto, quantidade: quantidade, opcionais: opcionais);
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${produto.nome} adicionado ao carrinho!'),
-        duration: const Duration(seconds: 2),
+        duration: const Duration(seconds: 3),
         backgroundColor: Colors.green,
         action: SnackBarAction(
           label: 'VER CARRINHO',

@@ -29,6 +29,15 @@ class ItemPedido {
 
   /// Retorna o subtotal (preço unitário com adicionais * quantidade).
   double get subtotal => precoUnitarioComAdicionais * quantidade;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'produto_id': produto.id,
+      'quantidade': quantidade,
+      'opcionais_ids': opcionaisSelecionados.map((o) => o.id).toList(),
+      'observacoes': observacoes,
+    };
+  }
 }
 
 class Pedido {
@@ -51,6 +60,17 @@ class Pedido {
     this.observacoesGerente,
     required this.valorTotal,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'id_cliente': idCliente,
+      'itens': itens.map((item) => item.toJson()).toList(),
+      'status': status.name,
+      'data_hora_pedido': dataHoraPedido.toIso8601String(),
+      'valor_total': valorTotal,
+    };
+  }
 
   // Método para atualizar o status do pedido
   void atualizarStatus(StatusPedido novoStatus) {

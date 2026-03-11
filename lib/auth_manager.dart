@@ -7,19 +7,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthManager with ChangeNotifier {
   Usuario? _currentUser;
   UserRole _currentRole = UserRole.none;
-  String? _currentTableIdForDevice; // Mesa configurada para este dispositivo
+  String? _mesaIdForDevice;
+  int? _mesaNumeroForDevice;
 
-  static const String _tableIdKey = 'device_table_id';
-  // static const String gerentemasterpinkey = 'gerente_master_pin'; // Removido: variável não utilizada
+  static const String _mesaIdKey = 'mesa_id';
+  static const String _mesaNumeroKey = 'mesa_numero';
+  static const String _legacyTableIdKey = 'device_table_id';
+  static const String _backendUrlKey = 'backend_url';
+  static const String _legacyBackendUrlKey = 'custom_base_url';
 
   Usuario? get currentUser => _currentUser;
   UserRole get currentRole => _currentRole;
-  String? get currentTableIdForDevice => _currentTableIdForDevice;
+  String? get mesaIdForDevice => _mesaIdForDevice;
+  int? get mesaNumeroForDevice => _mesaNumeroForDevice;
+  String? get currentTableIdForDevice => _mesaIdForDevice;
 
   bool get isUserLoggedIn =>
       _currentUser != null && _currentRole != UserRole.none;
   bool get isDeviceConfiguredAsTable =>
-      _currentTableIdForDevice != null && _currentRole == UserRole.cliente;
+      _mesaIdForDevice != null &&
+      _mesaNumeroForDevice != null &&
+      _currentRole == UserRole.cliente;
 
   // Helper para acessar o caminho da logo
   String getAppLogoPath() => AppConfig.instance.logoAssetPath;
@@ -30,16 +38,29 @@ class AuthManager with ChangeNotifier {
 
   Future<void> _loadInitialState() async {
     final prefs = await SharedPreferences.getInstance();
-    final tableId = prefs.getString(_tableIdKey);
-    if (tableId != null && tableId.isNotEmpty) {
-      _currentTableIdForDevice = tableId;
-      _currentUser = Usuario.mesaCliente(
-        tableId,
-      ); // Cria um usuário "cliente de mesa"
+
+    final mesaId = prefs.getString(_mesaIdKey);
+    final mesaNumero = prefs.getInt(_mesaNumeroKey);
+
+    if (mesaId != null && mesaId.isNotEmpty && mesaNumero != null) {
+      _mesaIdForDevice = mesaId;
+      _mesaNumeroForDevice = mesaNumero;
+      _currentUser = Usuario.mesaCliente(mesaId: mesaId, mesaNumero: mesaNumero);
       _currentRole = UserRole.cliente;
-      // print('AuthManager: Dispositivo carregado como Mesa $tableId');
     } else {
-      // print('AuthManager: Nenhuma mesa configurada para este dispositivo.');
+      final legacyTable = prefs.getString(_legacyTableIdKey);
+      final legacyMesaNumero = int.tryParse(legacyTable ?? '');
+      if (legacyTable != null && legacyTable.isNotEmpty && legacyMesaNumero != null) {
+        _mesaIdForDevice = legacyTable;
+        _mesaNumeroForDevice = legacyMesaNumero;
+        _currentUser = Usuario.mesaCliente(
+          mesaId: legacyTable,
+          mesaNumero: legacyMesaNumero,
+        );
+        _currentRole = UserRole.cliente;
+        await prefs.setString(_mesaIdKey, legacyTable);
+        await prefs.setInt(_mesaNumeroKey, legacyMesaNumero);
+      }
     }
     notifyListeners();
   }
@@ -54,9 +75,6 @@ class AuthManager with ChangeNotifier {
         role: UserRole.gerente,
       );
       _currentRole = UserRole.gerente;
-      _currentTableIdForDevice = null; // Gerente não está preso a uma mesa
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_tableIdKey); // Limpa configuração de mesa anterior
       notifyListeners();
       return true;
     }
@@ -72,22 +90,28 @@ class AuthManager with ChangeNotifier {
         role: UserRole.suporte,
       );
       _currentRole = UserRole.suporte;
-      _currentTableIdForDevice = null;
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_tableIdKey);
       notifyListeners();
       return true;
     }
     return false;
   }
 
-  Future<void> setTableForDevice(String tableId) async {
+  Future<void> setMesaForDevice({
+    required String backendUrl,
+    required String mesaId,
+    required int mesaNumero,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_tableIdKey, tableId);
-    _currentTableIdForDevice = tableId;
-    _currentUser = Usuario.mesaCliente(tableId);
+    await prefs.setString(_backendUrlKey, backendUrl);
+    await prefs.remove(_legacyBackendUrlKey);
+    await prefs.setString(_mesaIdKey, mesaId);
+    await prefs.setInt(_mesaNumeroKey, mesaNumero);
+    await prefs.setString(_legacyTableIdKey, mesaNumero.toString());
+
+    _mesaIdForDevice = mesaId;
+    _mesaNumeroForDevice = mesaNumero;
+    _currentUser = Usuario.mesaCliente(mesaId: mesaId, mesaNumero: mesaNumero);
     _currentRole = UserRole.cliente;
-    // print('AuthManager: Dispositivo configurado para Mesa $tableId');
     notifyListeners();
   }
 
@@ -117,11 +141,16 @@ class AuthManager with ChangeNotifier {
   // Usado pelo gerente para desconfigurar o dispositivo de uma mesa
   Future<void> clearTableForDeviceAndLogoutGerente() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_tableIdKey);
-    _currentTableIdForDevice = null;
+    await prefs.remove(_mesaIdKey);
+    await prefs.remove(_mesaNumeroKey);
+    await prefs.remove(_legacyTableIdKey);
+    await prefs.remove(_backendUrlKey);
+    await prefs.remove(_legacyBackendUrlKey);
+
+    _mesaIdForDevice = null;
+    _mesaNumeroForDevice = null;
     _currentUser = null; // Limpa o usuário gerente também
     _currentRole = UserRole.none;
-    // print('AuthManager: Configuração de mesa removida do dispositivo.');
     notifyListeners();
   }
 }

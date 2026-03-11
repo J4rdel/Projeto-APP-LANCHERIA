@@ -21,4 +21,12 @@ class Opcional {
           : (json['preco_adicional'] as num).toDouble(),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'nome': nome,
+      'preco_adicional': precoAdicional,
+    };
+  }
 }

@@ -17,11 +17,10 @@ class Usuario {
     this.assignedTableIdForDevice,
   });
 
-  // Construtor de fábrica para facilitar a criação de um usuário "Cliente de Mesa"
-  factory Usuario.mesaCliente(String mesaId) {
+  factory Usuario.mesaCliente({required String mesaId, required int mesaNumero}) {
     return Usuario(
       id: mesaId, // Usamos o ID da mesa como ID do "usuário" cliente
-      nome: 'Mesa $mesaId',
+      nome: 'Mesa $mesaNumero',
       role: UserRole.cliente,
       assignedTableIdForDevice: mesaId,
     );

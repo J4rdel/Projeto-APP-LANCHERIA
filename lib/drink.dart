@@ -21,11 +21,11 @@ class Drink extends Produto {
     }
 
     return Drink(
-      id: int.tryParse(json['id'].toString()) ?? 0,
+      id: (json['id'] ?? json['produto_id'] ?? json['produtoId'] ?? '').toString(),
       nome: json['nome'] ?? '',
       descricao: json['descricao'] ?? '',
       preco: double.tryParse(json['preco'].toString()) ?? 0.0,
-      imagemUrl: json['imagem_url'] ?? '', // Corrigido para 'imagem_url' para consistência
+      imagemUrl: json['imagem_url'] ?? json['imagemUrl'] ?? '',
       opcionais: opcionaisList,
     );
   }

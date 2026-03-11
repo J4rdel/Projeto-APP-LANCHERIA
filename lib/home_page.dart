@@ -3,12 +3,13 @@ import 'package:lancheria/lanches_page.dart';
 import 'package:lancheria/drinks_page.dart';
 import 'package:lancheria/sobremesas_page.dart';
 import 'package:lancheria/minha_conta_page.dart';
-import 'package:lancheria/gerenciamento_pedidos_page.dart';
 import 'package:lancheria/app_config.dart'; // Importar AppConfig
 import 'package:lancheria/carrinho_page.dart'; // Importar CarrinhoPage
 import 'package:lancheria/avaliar_local_page.dart'; // Importar AvaliarLocalPage
 import 'package:provider/provider.dart'; // Importar Provider
 import 'package:lancheria/theme_manager.dart'; // Importar ThemeManager
+import 'package:lancheria/auth_manager.dart';
+import 'package:lancheria/logIn_page.dart';
 
 enum ContentView {
   lanches,
@@ -17,7 +18,6 @@ enum ContentView {
   carrinho, // Nova visualização para o carrinho
   avaliarLocal,
   minhaConta,
-  gestaoPedidos,
 }
 
 class HomePage extends StatefulWidget {
@@ -81,8 +81,6 @@ class _HomePageState extends State<HomePage> {
         return const AvaliarLocalPage(); // Deve ser ajustada para não ter Scaffold
       case ContentView.minhaConta:
         return const MinhaContaPage(); // Deve ser ajustada para não ter Scaffold
-      case ContentView.gestaoPedidos:
-        return const GerenciamentoPedidosPage(); // Deve ser ajustada para não ter Scaffold
     }
   }
 
@@ -103,16 +101,29 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     // Acessa o ThemeManager para determinar o ícone e texto do botão de tema
     final themeManager = Provider.of<ThemeManager>(context);
+    final authManager = Provider.of<AuthManager>(context);
     final bool isDarkMode = themeManager.themeMode == ThemeMode.dark;
+    final mesaNumero = authManager.mesaNumeroForDevice;
 
     return Scaffold(
       // A cor de fundo do Scaffold virá do theme: scaffoldBackgroundColor
       appBar: AppBar(
         title: Text(
-          'Cardápio ${_appConfig.establishmentName}',
+          mesaNumero != null
+              ? 'Mesa $mesaNumero - Cardápio ${_appConfig.establishmentName}'
+              : 'Cardápio ${_appConfig.establishmentName}',
         ), // Usar nome do AppConfig
         // backgroundColor e foregroundColor virão do appBarTheme no main.dart
         actions: [
+          IconButton(
+            icon: const Icon(Icons.lock_outline),
+            tooltip: 'Gerente/Suporte',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
+            },
+          ),
           IconButton(
             icon: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode),
             tooltip: isDarkMode
@@ -213,11 +224,6 @@ class _HomePageState extends State<HomePage> {
                         'MINHA CONTA',
                         Icons.person_outline,
                         ContentView.minhaConta,
-                      ),
-                      _buildLeftPanelItem(
-                        'GESTÃO DE PEDIDOS',
-                        Icons.article_outlined,
-                        ContentView.gestaoPedidos,
                       ),
                       const Divider(
                         height: 24,

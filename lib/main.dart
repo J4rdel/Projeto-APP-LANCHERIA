@@ -6,15 +6,23 @@ import 'gerenciador_pedidos.dart'; // Adicionado
 //import 'package:firebase_core/firebase_core.dart'; // Importar Firebase Core
 //import 'firebase_options.dart'; // Importar as opções de configuração do Firebase
 import 'app_config.dart'; // Importar AppConfig
+import 'api_service.dart'; // Importar ApiService
 import 'theme_manager.dart'; // Importar ThemeManager
 import 'auth_manager.dart'; // Importar AuthManager
 import 'configuracoes_page.dart'; // Importar para usar o AppSettingsLoader
+import 'app_settings_loader.dart'; // Importar o novo serviço
 import 'user_role.dart'; // Importar UserRole
 import 'logIn_page.dart'; // Corrigido para corresponder ao nome do arquivo
+import 'mesa_vinculo_page.dart';
+import 'pedido_socket_service.dart';
 
 void main() async {
   // 1. Transforme main em async
   WidgetsFlutterBinding.ensureInitialized(); // 2. Garanta que os bindings do Flutter estão inicializados
+  
+  // Carrega a URL base da API salva
+  await ApiService.loadBaseUrl();
+
   // await Firebase.initializeApp( // TEMPORARIAMENTE COMENTADO PARA TESTES SEM FIREBASE CONFIGURADO
   //   // 3. Inicialize o Firebase
   //   options: DefaultFirebaseOptions
@@ -50,6 +58,11 @@ class LancheriaApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => AuthManager(),
         ), // Adicionar AuthManager
+        ChangeNotifierProxyProvider2<AuthManager, GerenciadorPedidos, PedidoSocketService>(
+          create: (context) => PedidoSocketService(),
+          update: (context, authManager, gerenciadorPedidos, service) =>
+              service!..updateDependencies(authManager, gerenciadorPedidos),
+        ),
         ChangeNotifierProvider(
           create: (context) => ThemeManager(
             initialThemeMode,
@@ -67,7 +80,7 @@ class LancheriaApp extends StatelessWidget {
             // Carrega os temas com base nas configurações salvas
             future: Future.wait([
               AppSettingsLoader.buildThemeDataFromSettings(_buildThemeData(AppConfig.lightThemeColors, appConfig), false),
-              AppSettingsLoader.buildThemeDataFromSettings(_buildThemeData(AppConfig.darkThemeColors, appConfig), true),
+              Future.value(_buildThemeData(AppConfig.darkThemeColors, appConfig)),
             ]),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
@@ -84,12 +97,9 @@ class LancheriaApp extends StatelessWidget {
                 theme: lightTheme,
                 darkTheme: darkTheme,
                 themeMode: themeManager.themeMode, // Usar o themeMode do ThemeManager
-                home: authManager.isDeviceConfiguredAsTable || // Se o dispositivo está configurado como mesa
-                        (authManager.isUserLoggedIn &&
-                            authManager.currentRole ==
-                                UserRole.suporte) // Ou se é um suporte logado
-                    ? const HomePage() // Então vai para HomePage
-                    : const LoginPage(), // Caso contrário, LoginPage (isso inclui gerente que precisa ver opções, ou ninguém logado)
+                home: authManager.isDeviceConfiguredAsTable || authManager.isUserLoggedIn
+                    ? const HomePage()
+                    : const MesaVinculoPage(),
           );
             },
           );

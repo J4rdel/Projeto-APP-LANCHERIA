@@ -24,9 +24,12 @@ class _PedidoDetalhesPageState extends State<PedidoDetalhesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final gerenciadorLive = Provider.of<GerenciadorPedidos>(context);
+    final pedido = gerenciadorLive.findById(widget.pedido.id) ?? widget.pedido;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detalhes do Pedido #${widget.pedido.id}'),
+        title: Text('Detalhes do Pedido #${pedido.id}'),
         backgroundColor: Colors.deepOrange,
       ),
       body: Padding(
@@ -35,11 +38,11 @@ class _PedidoDetalhesPageState extends State<PedidoDetalhesPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Status Atual: ${widget.pedido.status.displayName}', // Usando extensão
+              'Status Atual: ${pedido.status.displayName}', // Usando extensão
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: widget.pedido.status.color, // Usando extensão
+                color: pedido.status.color, // Usando extensão
               ),
             ),
             const SizedBox(height: 20),
@@ -49,9 +52,9 @@ class _PedidoDetalhesPageState extends State<PedidoDetalhesPage> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: widget.pedido.itens.length,
+                itemCount: pedido.itens.length,
                 itemBuilder: (context, index) {
-                  final itemPedido = widget.pedido.itens[index];
+                  final itemPedido = pedido.itens[index];
                   return ListTile(
                     title: Text(itemPedido.produto.nome),
                     subtitle: Text(
@@ -68,7 +71,7 @@ class _PedidoDetalhesPageState extends State<PedidoDetalhesPage> {
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                'Total: R\$ ${widget.pedido.valorTotal.toStringAsFixed(2)}',
+                'Total: R\$ ${pedido.valorTotal.toStringAsFixed(2)}',
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -78,7 +81,7 @@ class _PedidoDetalhesPageState extends State<PedidoDetalhesPage> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Observações do Gerente: ${widget.pedido.observacoesGerente ?? 'Nenhuma'}', // Corrigido campo e label
+              'Observações do Gerente: ${pedido.observacoesGerente ?? 'Nenhuma'}', // Corrigido campo e label
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 30),
@@ -113,21 +116,17 @@ class _PedidoDetalhesPageState extends State<PedidoDetalhesPage> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  final gerenciador = Provider.of<GerenciadorPedidos>(
-                    context,
-                    listen: false,
-                  );
-                  widget.pedido.atualizarStatus(
+                  pedido.atualizarStatus(
                     _selectedStatus,
                   ); // Atualiza o status no objeto Pedido
-                  gerenciador.updatePedido(
-                    widget.pedido,
+                  gerenciadorLive.updatePedido(
+                    pedido,
                   ); // Notifica o gerenciador para reconstruir a lista
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Status do Pedido #${widget.pedido.id} atualizado para ${_selectedStatus.displayName}!',
+                        'Status do Pedido #${pedido.id} atualizado para ${_selectedStatus.displayName}!',
                       ), // Usando extensão
                       backgroundColor: Colors.green,
                     ),

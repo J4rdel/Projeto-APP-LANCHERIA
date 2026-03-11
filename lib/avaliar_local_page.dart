@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lancheria/api_service.dart';
+import 'package:lancheria/auth_manager.dart';
+import 'package:provider/provider.dart';
 
 class AvaliarLocalPage extends StatefulWidget {
   const AvaliarLocalPage({super.key});
@@ -19,6 +22,7 @@ class _AvaliarLocalPageState extends State<AvaliarLocalPage> {
 
   int _rating = 0; // Estado para a avaliação de estrelas
   final TextEditingController _feedbackController = TextEditingController();
+  bool _isSending = false;
 
   @override
   void dispose() {
@@ -90,30 +94,76 @@ class _AvaliarLocalPageState extends State<AvaliarLocalPage> {
             ),
             const SizedBox(height: _kVerticalSpacing),
             ElevatedButton(
-              onPressed: () {
-                if (_rating > 0) {
-                  // Aqui você enviaria a avaliação e o feedback para um backend ou salvaria localmente.
-                  // Por enquanto, apenas mostraremos um SnackBar.
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Avaliação de $_rating estrelas enviada! Obrigado pelo feedback.',
-                      ),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                  Navigator.pop(context); // Volta para a tela anterior
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Por favor, selecione uma avaliação em estrelas.',
-                      ),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              },
+              onPressed: _isSending
+                  ? null
+                  : () async {
+                      if (_rating <= 0) {
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Por favor, selecione uma avaliação em estrelas.'),
+                            backgroundColor: Colors.red,
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                        return;
+                      }
+
+                      final authManager = Provider.of<AuthManager>(context, listen: false);
+                      final mesaId = authManager.mesaIdForDevice;
+                      final mesaNumero = authManager.mesaNumeroForDevice;
+
+                      if (mesaId == null || mesaId.isEmpty || mesaNumero == null) {
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Tablet não está vinculado a uma mesa.'),
+                            backgroundColor: Colors.red,
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                        return;
+                      }
+
+                      setState(() => _isSending = true);
+                      try {
+                        await ApiService.postFeedback(
+                          mesaId: mesaId,
+                          mesaNumero: mesaNumero,
+                          estrelas: _rating,
+                          mensagem: _feedbackController.text.trim().isEmpty
+                              ? null
+                              : _feedbackController.text.trim(),
+                        );
+
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Avaliação enviada! Obrigado pelo feedback.'),
+                            backgroundColor: Colors.green,
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+
+                        setState(() {
+                          _rating = 0;
+                          _feedbackController.clear();
+                        });
+                      } catch (e) {
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Erro ao enviar feedback: $e'),
+                            backgroundColor: Colors.red,
+                            duration: const Duration(seconds: 3),
+                          ),
+                        );
+                      } finally {
+                        if (mounted) setState(() => _isSending = false);
+                      }
+                    },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(
                   context,
@@ -129,7 +179,7 @@ class _AvaliarLocalPageState extends State<AvaliarLocalPage> {
                 ),
               ),
               child: Text(
-                'Enviar Avaliação',
+                _isSending ? 'Enviando...' : 'Enviar Avaliação',
                 style: TextStyle(
                   fontSize: 20,
                 ), // A cor do texto é definida por foregroundColor
